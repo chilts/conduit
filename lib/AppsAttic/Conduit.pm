@@ -33,6 +33,7 @@ sub home {
     # $self->res_content( qq{Hello, World!\n} );
     # $self->render_content();
 
+    $self->stash_set('title', 'Whassssuuuupppppp<>!');
     $self->render_template( q{item-news.html} );
 }
 
