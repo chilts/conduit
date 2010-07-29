@@ -10,7 +10,7 @@ use Template::Constants qw( :debug );
 use DBI;
 
 use base qw(Class::Accessor);
-__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session cookies res_status res_content res_content_type rendered) );
+__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_content res_content_type rendered) );
 
 ## ----------------------------------------------------------------------------
 # setup, handlers dispatchers and suchlike
@@ -18,16 +18,15 @@ __PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session cookies res_status res_c
 sub setup {
     my ($self, $filename) = @_;
 
-    my $cfg = Config::Simple->new( $filename );
-    $self->cfg($cfg);
+    # read in and set the config
+    $self->cfg( Config::Simple->new( $filename ) );
 
     # this should be provided by the inheriting class
     $self->setup_handlers();
 }
 
 sub setup_handlers {
-    my ($self) = @_;
-    die 'setup_handlers() should be provided by the inheriting class';
+    die 'setup_handlers(): should be provided by the inheriting class';
 }
 
 sub add_handler {
@@ -37,8 +36,8 @@ sub add_handler {
 
 sub reset {
     my ($self) = @_;
-    delete $self->{cookie};
-    delete $self->{session};
+    $self->cookie_clear();
+    $self->session_clear();
     $self->stash_clear();
     $self->rendered(0);
 }
@@ -71,19 +70,27 @@ sub cfg_value {
     return $self->cfg->param($key);
 }
 
+sub cfg_clear {
+    # do nothing, since we want to keep it
+}
+
 ## ----------------------------------------------------------------------------
 # cookie stuff
 
-sub cookie_set {
-    # ToDo: heh, so many stubs ... :)
+sub cookie {
+    my ($self) = @_;
+    $self->{cookie} ||= CGI::Cookie->fetch();
+    # use Data::Dumper;
+    # print Dumper($self->{cookie});
+    return $self->{cookie};
 }
 
 sub cookie_get {
     my ($self, $name) = @_;
-    return $self->cookies->{$name};
+    return $self->cookie->{$name};
 }
 
-sub set_cookie {
+sub cookie_set {
     my ($self, $name, $value, $opts) = @_;
 
     # defaults
@@ -92,40 +99,80 @@ sub set_cookie {
     # ToDo: heh, so many stubs ... :)
 }
 
+sub cookie_clear {
+    my ($self) = @_;
+    $self->{cookie} = undef;
+}
+
 ## ----------------------------------------------------------------------------
 # database (db) stuff
 
-sub db_h {
+sub dbh {
     my ($self) = @_;
 
     return $self->{dbh} if $self->{dbh};
 
+    # get any config options
+    my $db_name = $self->cfg_value( q{db_name} );
+    my $db_user = $self->cfg_value( q{db_user} );
+    my $db_pass = $self->cfg_value( q{db_pass} );
+    my $db_host = $self->cfg_value( q{db_host} );
+    my $db_port = $self->cfg_value( q{db_port} );
+
+    # make the connection string
+    my $connect_str = qq{dbi:pg:dbname=$db_name};
+    $connect_str .= qq{;host=$db_host} if $db_host;
+    $connect_str .= qq{;port=$db_port} if $db_host;
+
     # connect to the DB
-    # ToDo: heh, so many stubs ... :)
+    $self->{dbh} = DBI->connect(
+        "dbi:Pg:dbname=$db_name",
+        $db_user,
+        $db_pass,
+        {
+            AutoCommit => 1, # act like psql
+            PrintError => 0, # don't print anything, we'll do it ourselves
+            RaiseError => 1, # always raise an error with something nasty
+        }
+    );
+
+    return $self->{dbh};
 }
 
 
 ## ----------------------------------------------------------------------------
 # session stuff
 
+sub session {
+    my ($self) = @_;
+    $self->{session} ||= $self->get_session();
+    return $self->{session};
+}
+
 sub session_set {
     # ToDo: heh, so many stubs ... :)
 }
 
 sub get_session {
-    my ($dbh, $cookies) = @_;
+    my ($self) = @_;
+
+    my $cookie = $self->cookie();
 
     # get the session cookie
-    my $cookie = $cookies->{session};
+    my $c = $cookie->{session};
 
     # firstly, check for a session
-    unless ( defined $cookie ) {
+    unless ( defined $c ) {
         warn "GetSession: No session cookie";
         return;
     }
 
     # get the value for convenience
-    my $value = $cookie->value();
+    my $value = $c->value();
+
+    # now we need the session store
+    # ToDo: this should be Redis, but for now use Pg
+    my $dbh = $self->dbh();
 
     # a session is alluded to
     my $sql = "
@@ -153,6 +200,11 @@ sub get_session {
 
     # all ok, return it
     return $session;
+}
+
+sub session_clear {
+    my ($self) = @_;
+    $self->{session} = undef;
 }
 
 ## ----------------------------------------------------------------------------
