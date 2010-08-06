@@ -6,8 +6,18 @@
 
 <h2>Params</h2>
 
+<p>
+  Good <a href="/debug?_action=new;msg=Hello,%20World!;keyword;empty=;v;v;list;list=;list=something">example
+  of params</a>: <code>action</code> is a scalar, <code>msg</code>
+  too. <code>keyword</code> and <code>empty</code> end up being the same,
+  <code>v</code> (for verbose) is an array and <code>list</code> is also an
+  array (with something in it).
+</p>
+
 <pre>
 [% Dumper.dump(conduit.req_params) | html %]
 </pre>
+
+<p>(Ends)</p>
 
 [% END %]
