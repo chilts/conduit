@@ -4,6 +4,7 @@ package CGI::Conduit;
 use strict;
 use warnings;
 
+use Data::Dumper;
 use Config::Simple;
 use Template;
 use Template::Constants qw( :debug );
@@ -34,8 +35,9 @@ sub setup_handlers {
 }
 
 sub add_handler {
-    my ($self, $re, $handler) = @_;
-    push @{$self->{handler}}, { re => $re, name => $handler };
+    my ($self, $spec, $handler) = @_;
+
+    push @{$self->{handler}}, { spec => $spec, name => $handler };
 }
 
 sub reset {
@@ -55,15 +57,37 @@ sub handle {
 
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
-        if ( $path =~ $handler->{re} ) {
-            my $name = $handler->{name};
-            $self->$name();
-            return;
+        warn "checking $handler against $handler->{spec}";
+
+        if ( ref $handler->{spec} eq 'Regexp' ) {
+            if ( $path =~ $handler->{spec} ) {
+                my $name = $handler->{name};
+                $self->$name();
+                return;
+            }
+        }
+        elsif ( ref $handler->{spec} eq 'ARRAY' ) {
+            foreach my $redirect_path ( @{$handler->{spec}} ) {
+                if ( $redirect_path eq $path ) {
+                    my $name = $handler->{name};
+                    $self->$name();
+                    return;
+                }
+            }
+        }
+        elsif ( ref $handler->{spec} eq 'HASH' ) {
+            warn "path=$path";
+            warn Dumper($handler->{spec});
+            if ( exists $handler->{spec}{$path} ) {
+                my $name = $handler->{name};
+                $self->$name();
+                return;
+            }
         }
     }
 
     # if we are here, then we haven't been told what to do, 404 it
-    $self->http_404();
+    $self->http_not_found();
 }
 
 ## ----------------------------------------------------------------------------

@@ -12,6 +12,13 @@ sub setup_handlers {
     my ($self) = @_;
     $self->add_handler( qr{ \A / \z }xms, 'home' );
 
+    # do a path based on a HASH
+    $self->add_handler( { '/api/' => 1, '/blog/' => 1, }, 'dunno' );
+
+    # the path based on an ARRAY (in this case, coming from the config)
+    my @sections = $self->cfg_value('sections');
+    $self->add_handler( \@sections, 'section_redirect' );
+
     return;
 
     # ToDo: make it look like this
@@ -35,6 +42,18 @@ sub home {
 
     $self->stash_set('title', 'Whassssuuuupppppp<>!');
     $self->render_template( q{item-news.html} );
+}
+
+sub section_redirect {
+    my ($self) = @_;
+
+    $self->http_moved_permanently( $self->req_path . '/' );
+}
+
+sub dunno {
+    my ($self) = @_;
+    $self->stash_set('title', 'Dunno what this is');
+    $self->render_template( q{item-blog-entry.html} );
 }
 
 ## ----------------------------------------------------------------------------
