@@ -13,7 +13,8 @@ sub setup_handlers {
     $self->add_handler( qr{ \A / \z }xms, 'home' );
 
     # do a path based on a HASH
-    $self->add_handler( { '/api/' => 1, '/blog/' => 1, }, 'dunno' );
+    $self->add_handler( { '/blog/' => 1, }, 'blog_entry' );
+    $self->add_handler( { '/api/' => 1, }, 'home' );
 
     # the path based on an ARRAY (in this case, coming from the config)
     my @sections = $self->cfg_value('sections');
@@ -50,7 +51,7 @@ sub section_redirect {
     $self->http_moved_permanently( $self->req_path . '/' );
 }
 
-sub dunno {
+sub blog_entry {
     my ($self) = @_;
     $self->stash_set('title', 'Dunno what this is');
     $self->render_template( q{item-blog-entry.html} );
