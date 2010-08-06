@@ -389,30 +389,6 @@ sub req_params {
     return \%params;
 }
 
-sub params2 {
-    my ($cgi) = @_;
-
-    # NOTE:
-    #    my $params = $cgi->Vars # Wrong
-    # ... gets a tied hash which has very weird happenings. Instead use a list
-    # context which returns a _copy_ of the hash.
-    my %params = $cgi->Vars;
-
-    # WTF is $params{keywords} ... just delete it if we have it, it's useless
-    # and we're not ever going to use it
-    # ie. /path?this        # makes a string : keywords => 'this'
-    # ie. /path?this+that   # makes an array : keywords => ['this','that']
-    delete $params{keywords};
-
-    # process the incoming parameters into arrays if they contain \0's
-    foreach my $param ( keys %params ) {
-        next unless $params{$param} =~ m{\0}xms;
-        # use of -1 means don't strip trailing empty slots
-        $params{$param} = [ split('\0', $params{$param}, -1) ];
-    }
-    return \%params;
-}
-
 ## ----------------------------------------------------------------------------
 # easy canned responses
 
