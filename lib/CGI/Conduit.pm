@@ -35,9 +35,9 @@ sub setup_handlers {
 }
 
 sub add_handler {
-    my ($self, $spec, $handler) = @_;
+    my ($self, $match, $handler) = @_;
 
-    push @{$self->{handler}}, { spec => $spec, name => $handler };
+    push @{$self->{handler}}, { match => $match, name => $handler };
 }
 
 sub reset {
@@ -57,17 +57,17 @@ sub handle {
 
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
-        warn "checking $handler against $handler->{spec}";
+        warn "checking $handler against $handler->{match}";
 
-        if ( ref $handler->{spec} eq 'Regexp' ) {
-            if ( $path =~ $handler->{spec} ) {
+        if ( ref $handler->{match} eq 'Regexp' ) {
+            if ( $path =~ $handler->{match} ) {
                 my $name = $handler->{name};
                 $self->$name();
                 return;
             }
         }
-        elsif ( ref $handler->{spec} eq 'ARRAY' ) {
-            foreach my $redirect_path ( @{$handler->{spec}} ) {
+        elsif ( ref $handler->{match} eq 'ARRAY' ) {
+            foreach my $redirect_path ( @{$handler->{match}} ) {
                 if ( $redirect_path eq $path ) {
                     my $name = $handler->{name};
                     $self->$name();
@@ -75,10 +75,10 @@ sub handle {
                 }
             }
         }
-        elsif ( ref $handler->{spec} eq 'HASH' ) {
+        elsif ( ref $handler->{match} eq 'HASH' ) {
             warn "path=$path";
-            warn Dumper($handler->{spec});
-            if ( exists $handler->{spec}{$path} ) {
+            warn Dumper($handler->{match});
+            if ( exists $handler->{match}{$path} ) {
                 my $name = $handler->{name};
                 $self->$name();
                 return;
