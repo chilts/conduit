@@ -84,6 +84,14 @@ sub handle {
                 return;
             }
         }
+        elsif ( defined $handler->{match} ) {
+            if ( $handler->{match} eq $path ) {
+                my $name = $handler->{name};
+                $self->$name();
+                # $self->"$handler->{name}"();
+                return;
+            }
+        }
     }
 
     # if we are here, then we haven't been told what to do, 404 it
@@ -319,6 +327,9 @@ sub render_template {
     die 'No template specified'
         unless defined $template_name;
 
+    # pass ourself (a conduit object) to the template, so it can get things
+    $self->stash_set('conduit', $self);
+
     # since rendering the Template could die, render first to a variable
     # then call the render_content method
     my $content;
@@ -365,6 +376,7 @@ sub req_params {
     # ie. /path?this+that   # makes an array : keywords => ['this','that']
     #
     if ( my $kw = delete $params{keywords} ) {
+        die "ToDo: We never actually get in here, so this code can be removed";
         $params{$kw} = '';
     }
 

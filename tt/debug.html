@@ -1,0 +1,13 @@
+[% USE Dumper %]
+
+[% WRAPPER 'layout-main.html' %]
+
+<h1>Debug</h1>
+
+<h2>Params</h2>
+
+<pre>
+[% Dumper.dump(conduit.req_params) | html %]
+</pre>
+
+[% END %]

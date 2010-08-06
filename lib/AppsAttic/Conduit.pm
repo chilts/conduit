@@ -20,6 +20,9 @@ sub setup_handlers {
     my @sections = $self->cfg_value('sections');
     $self->add_handler( \@sections, 'section_redirect' );
 
+    # let's check against a string (and this time we'll dump the config info)
+    $self->add_handler( '/debug', 'debug' );
+
     return;
 
     # ToDo: make it look like this
@@ -29,6 +32,12 @@ sub setup_handlers {
         # authenticated => 0,
         # admin         => 0,
     });
+}
+
+sub debug {
+    my ($self) = @_;
+    $self->stash_set('title', 'Debug');
+    $self->render_template( q{debug.html}, { conduit => $self } );
 }
 
 sub home {
