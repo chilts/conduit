@@ -18,6 +18,10 @@ __PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_content r
 sub setup {
     my ($self, $filename) = @_;
 
+    # check the file exists
+    -f $filename
+        or die "Config file doesn't exist: $!";
+
     # read in and set the config
     $self->cfg( Config::Simple->new( $filename ) );
 
