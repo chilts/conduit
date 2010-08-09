@@ -20,8 +20,9 @@ sub setup_handlers {
     my @sections = $self->cfg_value('sections');
     $self->add_handler( \@sections, 'section_redirect' );
 
-    # let's check against a string (and this time we'll dump the config info)
+    # let's check against a string for debug pages
     $self->add_handler( '/debug', 'debug' );
+    $self->add_handler( '/memcache', 'page_memcache' );
 
     return;
 
@@ -64,6 +65,24 @@ sub blog_entry {
     my ($self) = @_;
     $self->stash_set('title', 'Dunno what this is');
     $self->render_template( q{item-blog-entry.html} );
+}
+
+sub page_memcache {
+    my ($self) = @_;
+
+    # increment count (or set it if not yet set)
+    if ( !$self->memcache->incr('count') ) {
+        # couldn't increment so add it (don't use set since someone else might have done it already)
+        if ( !$self->memcache->add('count', 1) ) {
+            # add failed, so someone else did it already, so just try incr again
+            $self->memcache->incr('count')
+        }
+    }
+    warn 'count=', $self->memcache->get('count');
+
+    # now render the template
+    $self->stash_set('title', 'Memcache information');
+    $self->render_template( q{memcache.html} );
 }
 
 ## ----------------------------------------------------------------------------

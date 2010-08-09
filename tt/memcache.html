@@ -1,0 +1,19 @@
+[% USE Dumper %]
+
+[% WRAPPER 'layout-main.html' %]
+
+<h1>The Memcache Object</h1>
+
+<p>Loaded this page [% conduit.memcache.get('count') | html %] number of times.</p>
+
+<p>Memcache</p>
+<pre>
+[% Dumper.dump(conduit.memcache) | html %]
+</pre>
+
+<p>DBH</p>
+<pre>
+[% Dumper.dump(conduit.dbh) | html %]
+</pre>
+
+[% END %]

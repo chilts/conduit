@@ -9,6 +9,7 @@ use Config::Simple;
 use Template;
 use Template::Constants qw( :debug );
 use DBI;
+use Cache::Memcached;
 
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_content res_content_type rendered) );
@@ -246,7 +247,25 @@ sub session_clear {
 ## ----------------------------------------------------------------------------
 # memcached
 
-# ToDo
+sub memcache {
+    my ($self) = @_;
+
+    return $self->{memcache} if $self->{memcache};
+
+    # currently we have no memcache object, so let's create it
+    my @servers = $self->cfg_value( q{memcache_servers} );
+    my $ns = $self->cfg_value( q{memcache_namespace} );
+    warn Dumper(\@servers);
+
+    return unless @servers;
+
+    $self->{memcache} = Cache::Memcached->new({
+        'servers'   => \@servers,
+        'namespace' => $ns // '',
+    });
+
+    return $self->{memcache};
+}
 
 ## ----------------------------------------------------------------------------
 # redis
