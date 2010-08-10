@@ -260,7 +260,8 @@ sub memcache {
     my $ns = $self->cfg_value( q{memcache_namespace} );
     warn Dumper(\@servers);
 
-    return unless @servers;
+    die 'No memcache servers specified'
+        unless @servers;
 
     $self->{memcache} = Cache::Memcached->new({
         'servers'   => \@servers,
