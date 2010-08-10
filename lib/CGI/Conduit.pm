@@ -74,8 +74,6 @@ sub dispatch {
 
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
-        warn "checking $handler against $handler->{match}";
-
         if ( ref $handler->{match} eq 'Regexp' ) {
             if ( $path =~ $handler->{match} ) {
                 my $name = $handler->{name};
@@ -93,8 +91,6 @@ sub dispatch {
             }
         }
         elsif ( ref $handler->{match} eq 'HASH' ) {
-            warn "path=$path";
-            warn Dumper($handler->{match});
             if ( exists $handler->{match}{$path} ) {
                 my $name = $handler->{name};
                 $self->$name();
@@ -271,7 +267,6 @@ sub memcache {
     # currently we have no memcache object, so let's create it
     my @servers = $self->cfg_value( q{memcache_servers} );
     my $ns = $self->cfg_value( q{memcache_namespace} );
-    warn Dumper(\@servers);
 
     die 'No memcache servers specified'
         unless @servers;

@@ -78,7 +78,6 @@ sub page_memcache {
             $self->memcache->incr('count')
         }
     }
-    warn 'count=', $self->memcache->get('count');
 
     # now render the template
     $self->stash_set('title', 'Memcache information');
