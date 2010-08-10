@@ -342,9 +342,10 @@ sub res_header {
     );
 }
 
-sub render_content {
+sub render_final {
     my ($self) = @_;
 
+    # check if we have already been rendered
     die 'Page has already been rendered'
         if $self->rendered();
 
@@ -352,6 +353,12 @@ sub render_content {
     $self->res_header();
     print $self->res_content;
     $self->rendered(1);
+}
+
+sub render_content {
+    my ($self, $content) = @_;
+    $self->res_content($content);
+    $self->render_final();
 }
 
 sub render_template {
@@ -372,15 +379,7 @@ sub render_template {
     $self->tt->process( $template_name, $self->stash(), \$content )
         || die $self->tt->error();
     $self->res_content($content);
-    $self->render_content();
-
-    return;
-
-    # headers first, then content, then remember we've done it
-    $self->res_header();
-    $self->tt->process( $template_name, $self->stash() )
-        || die $self->tt->error();
-    $self->rendered(1);
+    $self->render_final();
 }
 
 ## ----------------------------------------------------------------------------
