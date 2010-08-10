@@ -12,7 +12,7 @@ use CGI::Fast;
 
 my $app = AppsAttic::Conduit->new();
 
-$app->setup( q{/home/andy/work/conduit/etc/appsattic-conduit.cfg} );
+$app->setup();
 
 while ( my $cgi = CGI::Fast->new() ) {
     $app->handle($cgi);

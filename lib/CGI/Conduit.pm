@@ -20,6 +20,9 @@ __PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_content r
 sub setup {
     my ($self, $filename) = @_;
 
+    # use either filename passed in or the the ENV
+    $filename ||= $ENV{CONDUIT_CFG};
+
     # check the file exists
     -f $filename
         or die "Config file doesn't exist: $!";
