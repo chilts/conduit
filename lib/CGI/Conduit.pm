@@ -59,6 +59,19 @@ sub handle {
     $self->reset();
     $self->cgi($cgi);
 
+    eval {
+        $self->dispatch();
+    };
+    if ( $@ ) {
+        # if we are here, something went wrong, so serve a 500
+        warn "Application died: $@";
+        $self->http_internal_server_error();
+    }
+}
+
+sub dispatch {
+    my ($self) = @_;
+
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
         warn "checking $handler against $handler->{match}";
