@@ -443,22 +443,17 @@ sub http_moved_permanently {
     );
 }
 
-sub http_html_header {
-    my ($self) = @_;
-    print $self->cgi->header('text/html; charset=utf-8');
-}
-
 sub http_not_found {
     my ($self) = @_;
-    print $self->cgi->header(
-        'text/html; charset=utf-8',
-        -status => '404 Not Found',
-    );
-
-    print "<h1>404 File not found!</h1>\n";
-    # template('404'); # ToDo
+    $self->res_status(404);
+    $self->render_template( q{404.html} );
 }
 
+sub http_internal_server_error {
+    my ($self) = @_;
+    $self->res_status(500);
+    $self->render_template( q{500.html} );
+}
 
 ## ----------------------------------------------------------------------------
 1;
