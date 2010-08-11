@@ -24,6 +24,7 @@ sub setup_handlers {
     $self->add_handler( '/debug', 'debug' );
     $self->add_handler( '/memcache', 'page_memcache' );
     $self->add_handler( '/cookie', 'page_cookie' );
+    $self->add_handler( '/cgi', 'page_cgi' );
 
     return;
 
@@ -115,6 +116,14 @@ sub page_cookie {
     # now render the template
     $self->stash_set('title', 'Cookie Information');
     $self->render_template( q{cookie.html} );
+}
+
+sub page_cgi {
+    my ($self) = @_;
+
+    # now render the template
+    $self->stash_set('title', 'CGI Info');
+    $self->render_template( q{cgi.html} );
 }
 
 ## ----------------------------------------------------------------------------

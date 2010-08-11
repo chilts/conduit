@@ -396,9 +396,29 @@ sub render_template {
 ## ----------------------------------------------------------------------------
 # get info about the request
 
+sub req_url {
+    my ($self) = @_;
+    $self->cgi->url();
+}
+
 sub req_path {
     my ($self) = @_;
-    $self->cgi->url( -absolute => 1 )
+    $self->cgi->url( -absolute => 1 );
+}
+
+sub req_method {
+    my ($self) = @_;
+    $self->cgi->request_method();
+}
+
+sub req_referer {
+    my ($self) = @_;
+    $self->cgi->referer();
+}
+
+sub req_remote_ip {
+    my ($self) = @_;
+    $self->cgi->remote_host();
 }
 
 sub req_params {

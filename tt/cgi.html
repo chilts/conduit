@@ -1,0 +1,42 @@
+[% USE Dumper %]
+
+[% WRAPPER 'layout-main.html' %]
+
+<h1>CGI</h1>
+
+<h2>Stuff we're delegating to CGI</h2>
+
+<ul>
+  <li>req_url = [% conduit.req_url %]</li>
+  <li>req_path = [% conduit.req_path %]</li>
+  <li>req_method = [% conduit.req_method %]</li>
+  <li>req_referer = [% conduit.req_referer %]</li>
+  <li>req_remote_ip = [% conduit.remote_ip %]</li>
+</ul>
+
+<h2>Stuff you can call on CGI</h2>
+
+<ul>
+  <li>request_method = [% conduit.cgi.request_method %]</li>
+  <li>remote_host = [% conduit.cgi.remote_host %]</li>
+  <li>referer = [% conduit.cgi.referer %]</li>
+  <li>url = [% conduit.cgi.url %]</li>
+  <li>user_agent = [% conduit.cgi.user_agent %]</li>
+  <li>path_info = [% conduit.cgi.path_info %]</li>
+  <li>script_name = [% conduit.cgi.script_name %]</li>
+  <li>server_name = [% conduit.cgi.server_name %]</li>
+  <li>virtual_host = [% conduit.cgi.virtual_host %]</li>
+  <li>server_port = [% conduit.cgi.server_port %]</li>
+  <li>virtual_port = [% conduit.cgi.virtual_port %]</li>
+  <li>server_software = [% conduit.cgi.server_software %]</li>
+  <li>content_type = [% conduit.cgi.content_type %]</li>
+  <li> = [% conduit.cgi %]</li>
+  <li> = [% conduit.cgi %]</li>
+  <li> = [% conduit.cgi %]</li>
+  <li> = [% conduit.cgi %]</li>
+  <li> = [% conduit.cgi %]</li>
+</ul>
+
+<p>(Ends)</p>
+
+[% END %]
