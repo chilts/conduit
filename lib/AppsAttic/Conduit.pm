@@ -111,6 +111,8 @@ sub page_cookie {
             warn "== 4, " . $c->value;
             # carry on incrementing the cookie
             $self->cookie_set( q{count} , $c->value + 1 );
+            $self->cookie_del( q{success} )
+                if $c->value == 5;
         }
     }
     else {
