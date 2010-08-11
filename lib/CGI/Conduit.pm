@@ -6,13 +6,14 @@ use warnings;
 
 use Data::Dumper;
 use Config::Simple;
-use Template;
-use Template::Constants qw( :debug );
+use CGI::Cookie;
 use DBI;
 use Cache::Memcached;
+use Template;
+use Template::Constants qw( :debug );
 
 use base qw(Class::Accessor);
-__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_content res_content_type rendered) );
+__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_cookie res_content res_content_type rendered) );
 
 ## ----------------------------------------------------------------------------
 # setup, handlers dispatchers and suchlike
@@ -128,9 +129,12 @@ sub cfg_clear {
 
 sub cookie {
     my ($self) = @_;
-    $self->{cookie} ||= CGI::Cookie->fetch();
-    # use Data::Dumper;
-    # print Dumper($self->{cookie});
+
+    return $self->{cookie} if $self->{cookie};
+
+    # get them from CGI::Cookie
+    my %cookies = CGI::Cookie->fetch();
+    $self->{cookie} = \%cookies;
     return $self->{cookie};
 }
 
@@ -143,13 +147,25 @@ sub cookie_set {
     my ($self, $name, $value, $opts) = @_;
 
     # defaults
-    my $expire = $opts->{expire} || $self->cfg->{'default-cookie-expiry'} || '+8hr';
+    my $expire = $opts->{expire} || '+8hr';
 
-    # ToDo: heh, so many stubs ... :)
+    my $c = CGI::Cookie->new(
+        -name    =>  $name,
+        -value   =>  $value,
+        -expires =>  $expire
+    );
+
+    # add this cookie to the response cookie list
+    push @{$self->{res_cookie}}, $c;
+}
+
+sub cookie_del {
+    my ($self, $name) = @_;
+    $self->cookie_set($name, '', { expire => '-3d' } );
 }
 
 sub cookie_clear {
-    my ($self) = @_;
+    my ($self, $name) = @_;
     $self->{cookie} = undef;
 }
 
@@ -332,7 +348,7 @@ sub res_header {
     print $self->cgi->header(
         -type   => $self->res_content_type || 'text/html; charset=utf-8',
         -status => $self->res_status || 200,
-        # -cookie => $self->res_cookie,
+        -cookie => $self->res_cookie,
         @{$self->{res_hdr}},
     );
 }
