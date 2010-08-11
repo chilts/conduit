@@ -23,6 +23,7 @@ sub setup_handlers {
     # let's check against a string for debug pages
     $self->add_handler( '/debug', 'debug' );
     $self->add_handler( '/memcache', 'page_memcache' );
+    $self->add_handler( '/cookie', 'page_cookie' );
 
     return;
 
@@ -82,6 +83,47 @@ sub page_memcache {
     # now render the template
     $self->stash_set('title', 'Memcache information');
     $self->render_template( q{memcache.html} );
+}
+
+sub page_cookie {
+    my ($self) = @_;
+
+    #use Data::Dumper;
+    #warn Dumper( $self->headers );
+
+    warn "== 1";
+
+    # read a cookie
+    my $cookie = $self->cookie();
+    if ( exists $cookie->{count} ) {
+        warn "== 2";
+        my $c = $cookie->{count};
+
+        # if we reach 10, delete the cookie completely
+        if ( $c->value >= 10 ) {
+            warn "== 3";
+            $self->cookie_del( q{count} );
+
+            # we now have a 'success'
+            $self->cookie_set( q{success} , 'Is Mine!' );
+        }
+        else {
+            warn "== 4, " . $c->value;
+            # carry on incrementing the cookie
+            $self->cookie_set( q{count} , $c->value + 1 );
+        }
+    }
+    else {
+        warn "== 5";
+        # create a new cookie with count as one
+        $self->cookie_set( q{count}, 1 );
+    }
+
+    warn "== 6";
+
+    # now render the template
+    $self->stash_set('title', 'Cookie Information');
+    $self->render_template( q{cookie.html} );
 }
 
 ## ----------------------------------------------------------------------------
