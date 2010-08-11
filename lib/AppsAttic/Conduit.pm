@@ -88,27 +88,19 @@ sub page_memcache {
 sub page_cookie {
     my ($self) = @_;
 
-    #use Data::Dumper;
-    #warn Dumper( $self->headers );
-
-    warn "== 1";
-
     # read a cookie
     my $cookie = $self->cookie();
     if ( exists $cookie->{count} ) {
-        warn "== 2";
         my $c = $cookie->{count};
 
         # if we reach 10, delete the cookie completely
         if ( $c->value >= 10 ) {
-            warn "== 3";
             $self->cookie_del( q{count} );
 
             # we now have a 'success'
             $self->cookie_set( q{success} , 'Is Mine!' );
         }
         else {
-            warn "== 4, " . $c->value;
             # carry on incrementing the cookie
             $self->cookie_set( q{count} , $c->value + 1 );
             $self->cookie_del( q{success} )
@@ -116,12 +108,9 @@ sub page_cookie {
         }
     }
     else {
-        warn "== 5";
         # create a new cookie with count as one
         $self->cookie_set( q{count}, 1 );
     }
-
-    warn "== 6";
 
     # now render the template
     $self->stash_set('title', 'Cookie Information');
