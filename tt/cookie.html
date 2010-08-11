@@ -1,0 +1,12 @@
+[% USE Dumper %]
+
+[% WRAPPER 'layout-main.html' %]
+
+<h1>Cookie Monster</h1>
+
+<p>Cookies</p>
+<pre>
+[% Dumper.dump(conduit.cookie) | html %]
+</pre>
+
+[% END %]
