@@ -1,0 +1,14 @@
+[% USE Dumper %]
+
+[% WRAPPER 'layout-main.html' %]
+
+<h1>Gym Session</h1>
+
+<p style="color: green;">[% msg | html %]</p>
+
+<p>Session</p>
+<pre>
+[% Dumper.dump(session) | html %]
+</pre>
+
+[% END %]

@@ -136,6 +136,7 @@ sub page_session {
 
     # now render the template
     $self->stash_set('title', 'Sessional');
+    $self->stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
@@ -155,6 +156,7 @@ sub page_session_new {
     # now render the template
     $self->stash_set('title', 'Sessional');
     $self->stash_set('msg', $msg);
+    $self->stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
@@ -174,6 +176,7 @@ sub page_session_del {
     # now render the template
     $self->stash_set('title', 'Sessional');
     $self->stash_set('msg', $msg);
+    $self->stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
