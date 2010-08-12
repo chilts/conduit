@@ -49,6 +49,7 @@ sub add_handler {
 
 sub reset {
     my ($self) = @_;
+    # don't do: cfg, dbh, memcache, redis or tt
     $self->cookie_clear();
     $self->session_clear();
     $self->stash_clear();
@@ -120,10 +121,6 @@ sub dispatch {
 sub cfg_value {
     my ($self, $key) = @_;
     return $self->cfg->param($key);
-}
-
-sub cfg_clear {
-    # do nothing, since we want to keep it
 }
 
 ## ----------------------------------------------------------------------------
