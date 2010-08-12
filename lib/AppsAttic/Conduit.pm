@@ -24,6 +24,11 @@ sub setup_handlers {
     $self->add_handler( '/debug', 'debug' );
     $self->add_handler( '/memcache', 'page_memcache' );
     $self->add_handler( '/cookie', 'page_cookie' );
+    $self->add_handler( '/session', 'page_session' );
+    $self->add_handler( '/session/new', 'page_session_new' );
+    $self->add_handler( '/session/invalid', 'page_session_set_invalid' );
+    $self->add_handler( '/session/unknown', 'page_session_set_unknown' );
+    $self->add_handler( '/session/del', 'page_session_del' );
     $self->add_handler( '/cgi', 'page_cgi' );
 
     return;
@@ -124,6 +129,74 @@ sub page_cgi {
     # now render the template
     $self->stash_set('title', 'CGI Info');
     $self->render_template( q{cgi.html} );
+}
+
+sub page_session {
+    my ($self) = @_;
+
+    # now render the template
+    $self->stash_set('title', 'Sessional');
+    $self->render_template( q{session.html} );
+}
+
+sub page_session_new {
+    my ($self) = @_;
+
+    # set a new session unless we already have one
+    my $msg;
+    if ( $self->session ) {
+        $msg = q{Session already exists, not written over};
+    }
+    else {
+        $self->session_new( { username => 'andy', admin => 1 } );
+        $msg = q{New session created};
+    }
+
+    # now render the template
+    $self->stash_set('title', 'Sessional');
+    $self->stash_set('msg', $msg);
+    $self->render_template( q{session.html} );
+}
+
+sub page_session_del {
+    my ($self) = @_;
+
+    # firstly, see if we have a session
+    my $msg;
+    if ( $self->session ) {
+        $msg = q{Session deleted};
+        $self->session_del();
+    }
+    else {
+        $msg = q{No session to delete};
+    }
+
+    # now render the template
+    $self->stash_set('title', 'Sessional');
+    $self->stash_set('msg', $msg);
+    $self->render_template( q{session.html} );
+}
+
+sub page_session_set_invalid {
+    my ($self) = @_;
+
+    $self->cookie_set( q{session}, 'Invalid session value/id');
+
+    # now render the template
+    $self->stash_set('title', 'Sessional');
+    $self->stash_set('msg', 'Invalid session set');
+    $self->render_template( q{session.html} );
+}
+
+sub page_session_set_unknown {
+    my ($self) = @_;
+
+    $self->cookie_set( q{session}, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+
+    # now render the template
+    $self->stash_set('title', 'Sessional');
+    $self->stash_set('msg', 'Valid session id, but unknown session set');
+    $self->render_template( q{session.html} );
 }
 
 ## ----------------------------------------------------------------------------

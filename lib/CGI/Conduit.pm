@@ -4,6 +4,7 @@ package CGI::Conduit;
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use Data::Dumper;
 use Config::Simple;
 use CGI::Cookie;
@@ -11,9 +12,10 @@ use DBI;
 use Cache::Memcached;
 use Template;
 use Template::Constants qw( :debug );
+use String::Random::NiceURL qw(id);
 
 use base qw(Class::Accessor);
-__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session res_status res_cookie res_content res_content_type rendered) );
+__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session session_id res_status res_cookie res_content res_content_type rendered) );
 
 ## ----------------------------------------------------------------------------
 # setup, handlers dispatchers and suchlike
@@ -147,6 +149,7 @@ sub cookie_set {
     my ($self, $name, $value, $opts) = @_;
 
     # defaults
+    $opts ||= {};
     my $expire = $opts->{expire} || '+8hr';
 
     my $c = CGI::Cookie->new(
@@ -204,76 +207,115 @@ sub dbh {
     return $self->{dbh};
 }
 
-
 ## ----------------------------------------------------------------------------
 # session stuff
 
 sub session {
     my ($self) = @_;
-    $self->{session} ||= $self->get_session();
-    return $self->{session};
+
+    return $self->{session} if $self->{session};
+
+    my $cookie = $self->cookie_get('session');
+    warn Dumper($cookie);
+
+    # firstly, check for a session
+    unless ( defined $cookie ) {
+        # warn "session(): No session cookie";
+        return;
+    }
+
+    # get the cookie value which is the session id and check it for validity
+    my $id = $cookie->value();
+    unless ( $self->is_session_id_valid($id) ) {
+        warn qq{session(): session id '$id' invalid};
+        $self->cookie_del( q{session} );
+        return;
+    }
+
+    # retrieve the session
+    my $session = $self->session_get( $id );
+    unless ( defined $session ) {
+        warn qq{session(): session id '$id' doesn't exist};
+        $self->cookie_del( q{session} );
+        return;
+    }
+
+    # remember the session and it's id
+    $self->session_id( $id );
+    $self->{session} = $session;
+
+    # return the session
+    return $session;
+}
+
+sub is_session_id_valid {
+    my ($self, $id) = @_;
+    return 1 if $id =~ m{ \A [A-Za-z0-9-_]{32} \z }xms;
+    return;
+}
+
+sub session_new {
+    my ($self, $value) = @_;
+
+    croak qq{Trying to set a session to undef}
+        unless $value;
+
+    my $id = id(32);
+    my $mc = $self->memcache();
+    unless ( $mc->set("session:$id", $value) ) {
+        warn "session_new(): Trying to set session $id failed";
+        return;
+    }
+
+    # setting the session worked, so set the appropriate bits and return the id
+    $self->cookie_set( q{session}, $id );
+    $self->session_id($id);
+    $self->{session} = $value;
+    return $id;
 }
 
 sub session_set {
-    # ToDo: heh, so many stubs ... :)
+    my ($self, $id, $value) = @_;
+
+    croak qq{Trying to set a session to undef}
+        unless $value;
+
+    my $mc = $self->memcache();
+    $mc->set("session:$id", $value);
 }
 
-sub get_session {
+sub session_get {
+    my ($self, $id) = @_;
+
+    # no need to check for a valid session id since that's already been done,
+    # so just return the session if it's there
+    return $self->memcache()->get( qq{session:$id} );
+}
+
+sub session_del {
     my ($self) = @_;
 
-    my $cookie = $self->cookie();
-
-    # get the session cookie
-    my $c = $cookie->{session};
-
-    # firstly, check for a session
-    unless ( defined $c ) {
-        warn "GetSession: No session cookie";
+    unless ( $self->session ) {
+        croak "session_del(): trying to delete a session which doesn't (yet) exist";
         return;
     }
 
-    # get the value for convenience
-    my $value = $c->value();
+    my $id = $self->session_id();
 
-    # now we need the session store
-    # ToDo: this should be Redis, but for now use Pg
-    my $dbh = $self->dbh();
-
-    # a session is alluded to
-    my $sql = "
-        SELECT
-            s.id AS s_id, s.name AS s_name,
-            a.id AS a_id, a.username AS a_username, a.email AS a_email, a.admin AS a_admin, a.salt AS a_salt
-        FROM
-            session s
-            LEFT JOIN account a ON (s.account_id = a.id)
-        WHERE
-            s.expiry > datetime('now')
-        AND
-            s.name = ?
-    ";
-    my $session = $dbh->selectrow_hashref($sql, undef, $value);
-
-    # check the session exists
-    unless ( defined $session ) {
-        warn "GetSession: No session in DB (with name $value)";
-        # ToDo: should really delete the cookie here
-        return;
-    }
-
-    warn "GetSession: Session found ($value)";
-
-    # all ok, return it
-    return $session;
+    # remove from memcache, set a cookie and clear what we have
+    $self->memcache->delete( qq{session:$id} );
+    $self->cookie_del( q{session} );
+    $self->session_clear();
 }
 
 sub session_clear {
     my ($self) = @_;
-    $self->{session} = undef;
+    delete $self->{session};
+    delete $self->{session_id};
 }
 
 ## ----------------------------------------------------------------------------
-# memcached
+# memcache
 
 sub memcache {
     my ($self) = @_;
@@ -294,6 +336,8 @@ sub memcache {
 
     return $self->{memcache};
 }
+
+# sub memcache_incr (so we don't have to write the weird stuff all the time)
 
 ## ----------------------------------------------------------------------------
 # redis
