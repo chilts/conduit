@@ -213,16 +213,12 @@ sub dbh {
 sub session {
     my ($self) = @_;
 
+    # if we already have the session, return it
     return $self->{session} if $self->{session};
 
+    # firstly, check for a session cookie
     my $cookie = $self->cookie_get('session');
-    warn Dumper($cookie);
-
-    # firstly, check for a session
-    unless ( defined $cookie ) {
-        # warn "session(): No session cookie";
-        return;
-    }
+    return unless defined $cookie;
 
     # get the cookie value which is the session id and check it for validity
     my $id = $cookie->value();
@@ -305,6 +301,7 @@ sub session_del {
     # remove from memcache, set a cookie and clear what we have
     $self->memcache->delete( qq{session:$id} );
     $self->cookie_del( q{session} );
+    delete $self->cookie->{session};
     $self->session_clear();
 }
 
