@@ -17,6 +17,8 @@ use String::Random::NiceURL qw(id);
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session session_id res_status res_cookie res_content res_content_type rendered) );
 
+our $VERSION = '0.01';
+
 ## ----------------------------------------------------------------------------
 # setup, handlers dispatchers and suchlike
 
@@ -527,3 +529,60 @@ sub http_internal_server_error {
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------
+
+=head1 NAME
+
+CGI::Conduit - base class for nice CGI::Fast web applications
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use AppsAttic::Conduit;
+    use CGI::Fast;
+
+    my $app = AppsAttic::Conduit->new();
+    $app->setup();
+    while ( my $cgi = CGI::Fast->new() ) {
+        $app->handle($cgi);
+    }
+
+=head1 DESCRIPTION
+
+This module allows you to setup a number of parts of your web application using
+only a config file. This includes things like connections to your database,
+memcache servers, redis, use of Template::Toolkit, and finally cookie and
+session dealings.
+
+Many things are 'baked' in at the moment (ie. the things I like) but am ready
+to split these off into separate roles so things can be mixed and matched.
+
+=head1 BUGS
+
+This section is left intentionally blank.
+
+=head1 SUPPORT
+
+Currently there is none since this module isn't yet officially released, but
+you can email me if you like.
+
+=back
+
+=head1 AUTHOR, COPYRIGHT & LICENSE
+
+Andrew Chilton, C<< <chilts at appsattic dot com> >>
+
+Copyright (c) 2010, Apps Attic Ltd, all rights reserved.
+
+L<http://www.appsattic.com/>
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but without any
+warranty; without even the implied warranty of merchantability or fitness for a
+particular purpose.
+
+=cut
