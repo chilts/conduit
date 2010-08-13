@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+COPYING
+lib/CGI/Conduit.pm
+t/00-load.t

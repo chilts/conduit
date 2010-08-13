@@ -1,0 +1,53 @@
+CGI-Conduit - v0.01
+===================
+
+Base class for nice CGI::Fast web applications.
+
+This module allows you to setup a number of parts of your web application using
+only a config file. This includes things like connections to your database,
+memcache servers, redis, use of Template::Toolkit, and finally cookie and
+session dealings.
+
+Many things are 'baked' in at the moment (ie. the things I like) but am ready
+to split these off into separate roles so things can be mixed and matched.
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc CGI::Conduit
+
+You can also look for information at:
+
+    Git Repository
+        http://git.appsattic.com/?p=conduit.git
+
+AUTHOR, COPYRIGHT AND LICENCE
+=============================
+
+Written by Andrew Chilton, <chilts at appsattic dot com>
+
+Copyright (c) 2010, Apps Attic Ltd, all rights reserved.
+
+http://www.appsattic.com/
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but without any
+warranty; without even the implied warranty of merchantability or fitness for a
+particular purpose.
+
+A copy of this license is supplied with the distribution as the file COPYING.
