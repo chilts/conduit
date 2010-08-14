@@ -348,6 +348,15 @@ sub stash_add {
     push @{$self->{stash}}, $value;
 }
 
+sub stash_params {
+    my ($self, @params) = @_;
+    my $param = $self->req_params();
+    foreach my $name ( @params ) {
+        $self->stash_set( $name, $param->{$name} )
+            if $param->{$name};
+    }
+}
+
 sub stash_del {
     my ($self, $key) = @_;
     delete $self->{stash}{$key};
