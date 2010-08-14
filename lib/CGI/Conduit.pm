@@ -1,23 +1,31 @@
 ## ----------------------------------------------------------------------------
 
 package CGI::Conduit;
-use strict;
-use warnings;
+
+use Moose;
 
 use Carp qw(croak);
 use Data::Dumper;
 use Config::Simple;
 use CGI::Cookie;
 use DBI;
-use Cache::Memcached;
 use Template;
 use Template::Constants qw( :debug );
 use String::Random::NiceURL qw(id);
 
-use base qw(Class::Accessor);
-__PACKAGE__->mk_accessors( qw(cfg stash cgi dbh session session_id res_status res_cookie res_content res_content_type rendered) );
-
 our $VERSION = '0.01';
+## ----------------------------------------------------------------------------
+# accessors
+
+has 'cfg' => ( is => 'rw' );
+has 'stash' => ( is => 'rw' );
+has 'cgi' => ( is => 'rw' );
+has 'session_id' => ( is => 'rw' );
+has 'res_status' => ( is => 'rw' );
+has 'res_cookie' => ( is => 'rw' );
+has 'res_content' => ( is => 'rw' );
+has 'res_content_type' => ( is => 'rw' );
+has 'rendered' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
 # setup, handlers dispatchers and suchlike
@@ -309,31 +317,6 @@ sub session_clear {
     delete $self->{session};
     delete $self->{session_id};
 }
-
-## ----------------------------------------------------------------------------
-# memcache
-
-sub memcache {
-    my ($self) = @_;
-
-    return $self->{memcache} if $self->{memcache};
-
-    # currently we have no memcache object, so let's create it
-    my @servers = $self->cfg_value( q{memcache_servers} );
-    my $ns = $self->cfg_value( q{memcache_namespace} );
-
-    die 'No memcache servers specified'
-        unless @servers;
-
-    $self->{memcache} = Cache::Memcached->new({
-        'servers'   => \@servers,
-        'namespace' => $ns // '',
-    });
-
-    return $self->{memcache};
-}
-
-# sub memcache_incr (so we don't have to write the weird stuff all the time)
 
 ## ----------------------------------------------------------------------------
 # redis

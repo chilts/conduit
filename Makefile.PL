@@ -14,8 +14,10 @@ WriteMakefile(
         'DBD::Pg' => 0,
         'Cache::Memcached' => 0,
         'CGI' => 0,
+        'CGI::Fast' => 0,
         'CGI::Cookie' => 0,
         'Config::Simple' => 0,
+        'Moose' => 0,
         # 'Template' => 0, # this gets changed to Template::Toolkit which we don't want
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
