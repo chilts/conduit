@@ -5,7 +5,6 @@ package CGI::Conduit;
 use Moose;
 
 use Carp qw(croak);
-use String::Random::NiceURL qw(id);
 
 # use the core roles
 with qw(
