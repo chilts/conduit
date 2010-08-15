@@ -3,7 +3,15 @@
 package AppsAttic::Conduit;
 
 use Moose;
+
 extends 'CGI::Conduit';
+
+with qw(
+    CGI::Conduit::Cookie
+    CGI::Conduit::Session
+    CGI::Conduit::Memcache
+    CGI::Conduit::Template
+);
 
 ## ----------------------------------------------------------------------------
 
@@ -43,21 +51,14 @@ sub setup_handlers {
 
 sub debug {
     my ($self) = @_;
-    $self->stash_set('title', 'Debug');
+    $self->tt_stash_set('title', 'Debug');
     $self->render_template( q{debug.html}, { conduit => $self } );
 }
 
 sub home {
     my ($self) = @_;
 
-    #print "Content-type: text/html\n\n";
-    #print "Hello, World!\n";
-
-    # $self->res_content_type( q{text/plain; charset=utf-8} );
-    # $self->res_content( qq{Hello, World!\n} );
-    # $self->render_content();
-
-    $self->stash_set('title', 'Whassssuuuupppppp<>!');
+    $self->tt_stash_set('title', 'Whassssuuuupppppp<>!');
     $self->render_template( q{item-news.html} );
 }
 
@@ -69,7 +70,7 @@ sub section_redirect {
 
 sub blog_entry {
     my ($self) = @_;
-    $self->stash_set('title', 'Dunno what this is');
+    $self->tt_stash_set('title', 'Dunno what this is');
     $self->render_template( q{item-blog-entry.html} );
 }
 
@@ -86,7 +87,7 @@ sub page_memcache {
     }
 
     # now render the template
-    $self->stash_set('title', 'Memcache information');
+    $self->tt_stash_set('title', 'Memcache information');
     $self->render_template( q{memcache.html} );
 }
 
@@ -118,7 +119,7 @@ sub page_cookie {
     }
 
     # now render the template
-    $self->stash_set('title', 'Cookie Information');
+    $self->tt_stash_set('title', 'Cookie Information');
     $self->render_template( q{cookie.html} );
 }
 
@@ -126,7 +127,7 @@ sub page_cgi {
     my ($self) = @_;
 
     # now render the template
-    $self->stash_set('title', 'CGI Info');
+    $self->tt_stash_set('title', 'CGI Info');
     $self->render_template( q{cgi.html} );
 }
 
@@ -134,8 +135,8 @@ sub page_session {
     my ($self) = @_;
 
     # now render the template
-    $self->stash_set('title', 'Sessional');
-    $self->stash_set('session', $self->session);
+    $self->tt_stash_set('title', 'Sessional');
+    $self->tt_stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
@@ -153,9 +154,9 @@ sub page_session_new {
     }
 
     # now render the template
-    $self->stash_set('title', 'Sessional');
-    $self->stash_set('msg', $msg);
-    $self->stash_set('session', $self->session);
+    $self->tt_stash_set('title', 'Sessional');
+    $self->tt_stash_set('msg', $msg);
+    $self->tt_stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
@@ -173,9 +174,9 @@ sub page_session_del {
     }
 
     # now render the template
-    $self->stash_set('title', 'Sessional');
-    $self->stash_set('msg', $msg);
-    $self->stash_set('session', $self->session);
+    $self->tt_stash_set('title', 'Sessional');
+    $self->tt_stash_set('msg', $msg);
+    $self->tt_stash_set('session', $self->session);
     $self->render_template( q{session.html} );
 }
 
@@ -185,8 +186,8 @@ sub page_session_set_invalid {
     $self->cookie_set( q{session}, 'Invalid session value/id');
 
     # now render the template
-    $self->stash_set('title', 'Sessional');
-    $self->stash_set('msg', 'Invalid session set');
+    $self->tt_stash_set('title', 'Sessional');
+    $self->tt_stash_set('msg', 'Invalid session set');
     $self->render_template( q{session.html} );
 }
 
@@ -196,8 +197,8 @@ sub page_session_set_unknown {
     $self->cookie_set( q{session}, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
 
     # now render the template
-    $self->stash_set('title', 'Sessional');
-    $self->stash_set('msg', 'Valid session id, but unknown session set');
+    $self->tt_stash_set('title', 'Sessional');
+    $self->tt_stash_set('msg', 'Valid session id, but unknown session set');
     $self->render_template( q{session.html} );
 }
 
