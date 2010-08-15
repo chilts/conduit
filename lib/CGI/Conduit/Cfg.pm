@@ -22,11 +22,6 @@ sub cfg {
     return $self->cfg_obj;
 }
 
-#sub cfg_load {
-#    my ($self, $filename) = @_;
-#    $self->cfg_obj( Config::Simple->new( $filename ) );
-#}
-
 sub cfg_value {
     my ($self, $key) = @_;
     return $self->cfg_obj->param($key);
