@@ -205,6 +205,12 @@ sub req_remote_ip {
     $self->cgi->remote_host();
 }
 
+sub req_param {
+    my ($self, $param_name) = @_;
+    my $params = $self->req_params;
+    return $params->{$param_name};
+}
+
 sub req_params {
     my ($self) = @_;
 
