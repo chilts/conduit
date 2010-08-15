@@ -5,14 +5,19 @@ package CGI::Conduit;
 use Moose;
 
 use Carp qw(croak);
-use Config::Simple;
 use String::Random::NiceURL qw(id);
 
+# use the core roles
+with qw(
+    CGI::Conduit::Cfg
+    CGI::Conduit::Cookie
+);
+
 our $VERSION = '0.01';
+
 ## ----------------------------------------------------------------------------
 # accessors
 
-has 'cfg' => ( is => 'rw' );
 has 'cgi' => ( is => 'rw' );
 has 'res_status' => ( is => 'rw' );
 has 'res_content' => ( is => 'rw' );
@@ -32,8 +37,8 @@ sub setup {
     -f $filename
         or die "Config file doesn't exist: $!";
 
-    # read in and set the config
-    $self->cfg( Config::Simple->new( $filename ) );
+    # set the config
+    $self->cfg( $filename );
 
     # this should be provided by the inheriting class
     $self->setup_handlers();
@@ -111,14 +116,6 @@ sub dispatch {
 
     # if we are here, then we haven't been told what to do, 404 it
     $self->http_not_found();
-}
-
-## ----------------------------------------------------------------------------
-# config (cfg)
-
-sub cfg_value {
-    my ($self, $key) = @_;
-    return $self->cfg->param($key);
 }
 
 ## ----------------------------------------------------------------------------
