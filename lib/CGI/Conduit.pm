@@ -5,12 +5,7 @@ package CGI::Conduit;
 use Moose;
 
 use Carp qw(croak);
-use Data::Dumper;
 use Config::Simple;
-use CGI::Cookie;
-use DBI;
-use Template;
-use Template::Constants qw( :debug );
 use String::Random::NiceURL qw(id);
 
 our $VERSION = '0.01';
@@ -22,7 +17,6 @@ has 'stash' => ( is => 'rw' );
 has 'cgi' => ( is => 'rw' );
 has 'session_id' => ( is => 'rw' );
 has 'res_status' => ( is => 'rw' );
-has 'res_cookie' => ( is => 'rw' );
 has 'res_content' => ( is => 'rw' );
 has 'res_content_type' => ( is => 'rw' );
 has 'rendered' => ( is => 'rw' );
@@ -62,7 +56,7 @@ sub reset {
     # don't do: cfg, dbh, memcache, redis or tt
     $self->cookie_clear();
     $self->session_clear();
-    $self->stash_clear();
+    $self->tt_clear();
     $self->rendered(0);
 }
 
@@ -134,238 +128,6 @@ sub cfg_value {
 }
 
 ## ----------------------------------------------------------------------------
-# cookie stuff
-
-sub cookie {
-    my ($self) = @_;
-
-    return $self->{cookie} if $self->{cookie};
-
-    # get them from CGI::Cookie
-    my %cookies = CGI::Cookie->fetch();
-    $self->{cookie} = \%cookies;
-    return $self->{cookie};
-}
-
-sub cookie_get {
-    my ($self, $name) = @_;
-    return $self->cookie->{$name};
-}
-
-sub cookie_set {
-    my ($self, $name, $value, $opts) = @_;
-
-    # defaults
-    $opts ||= {};
-    my $expire = $opts->{expire} || '+8hr';
-
-    my $c = CGI::Cookie->new(
-        -name    =>  $name,
-        -value   =>  $value,
-        -expires =>  $expire
-    );
-
-    # add this cookie to the response cookie list
-    push @{$self->{res_cookie}}, $c;
-}
-
-sub cookie_del {
-    my ($self, $name) = @_;
-    $self->cookie_set($name, '', { expire => '-3d' } );
-}
-
-sub cookie_clear {
-    my ($self, $name) = @_;
-    $self->{cookie} = undef;
-}
-
-## ----------------------------------------------------------------------------
-# database (db) stuff
-
-sub dbh {
-    my ($self) = @_;
-
-    return $self->{dbh} if $self->{dbh};
-
-    # get any config options
-    my $db_name = $self->cfg_value( q{db_name} );
-    my $db_user = $self->cfg_value( q{db_user} );
-    my $db_pass = $self->cfg_value( q{db_pass} );
-    my $db_host = $self->cfg_value( q{db_host} );
-    my $db_port = $self->cfg_value( q{db_port} );
-
-    # make the connection string
-    my $connect_str = qq{dbi:pg:dbname=$db_name};
-    $connect_str .= qq{;host=$db_host} if $db_host;
-    $connect_str .= qq{;port=$db_port} if $db_host;
-
-    # connect to the DB
-    $self->{dbh} = DBI->connect(
-        "dbi:Pg:dbname=$db_name",
-        $db_user,
-        $db_pass,
-        {
-            AutoCommit => 1, # act like psql
-            PrintError => 0, # don't print anything, we'll do it ourselves
-            RaiseError => 1, # always raise an error with something nasty
-        }
-    );
-
-    return $self->{dbh};
-}
-
-## ----------------------------------------------------------------------------
-# session stuff
-
-sub session {
-    my ($self) = @_;
-
-    # if we already have the session, return it
-    return $self->{session} if $self->{session};
-
-    # firstly, check for a session cookie
-    my $cookie = $self->cookie_get('session');
-    return unless defined $cookie;
-
-    # get the cookie value which is the session id and check it for validity
-    my $id = $cookie->value();
-    unless ( $self->is_session_id_valid($id) ) {
-        warn qq{session(): session id '$id' invalid};
-        $self->cookie_del( q{session} );
-        return;
-    }
-
-    # retrieve the session
-    my $session = $self->session_get( $id );
-    unless ( defined $session ) {
-        warn qq{session(): session id '$id' doesn't exist};
-        $self->cookie_del( q{session} );
-        return;
-    }
-
-    # remember the session and it's id
-    $self->session_id( $id );
-    $self->{session} = $session;
-
-    # return the session
-    return $session;
-}
-
-sub is_session_id_valid {
-    my ($self, $id) = @_;
-    return 1 if $id =~ m{ \A [A-Za-z0-9-_]{32} \z }xms;
-    return;
-}
-
-sub session_new {
-    my ($self, $value) = @_;
-
-    croak qq{Trying to set a session to undef}
-        unless $value;
-
-    my $id = id(32);
-    my $mc = $self->memcache();
-    unless ( $mc->set("session:$id", $value) ) {
-        warn "session_new(): Trying to set session $id failed";
-        return;
-    }
-
-    # setting the session worked, so set the appropriate bits and return the id
-    $self->cookie_set( q{session}, $id );
-    $self->session_id($id);
-    $self->{session} = $value;
-    return $id;
-}
-
-sub session_set {
-    my ($self, $id, $value) = @_;
-
-    croak qq{Trying to set a session to undef}
-        unless $value;
-
-    my $mc = $self->memcache();
-    $mc->set("session:$id", $value);
-}
-
-sub session_get {
-    my ($self, $id) = @_;
-
-    # no need to check for a valid session id since that's already been done,
-    # so just return the session if it's there
-    return $self->memcache()->get( qq{session:$id} );
-}
-
-sub session_del {
-    my ($self) = @_;
-
-    unless ( $self->session ) {
-        croak "session_del(): trying to delete a session which doesn't (yet) exist";
-        return;
-    }
-
-    my $id = $self->session_id();
-
-    # remove from memcache, set a cookie and clear what we have
-    $self->memcache->delete( qq{session:$id} );
-    $self->cookie_del( q{session} );
-    delete $self->cookie->{session};
-    $self->session_clear();
-}
-
-sub session_clear {
-    my ($self) = @_;
-    delete $self->{session};
-    delete $self->{session_id};
-}
-
-## ----------------------------------------------------------------------------
-# redis
-
-# ToDo
-
-## ----------------------------------------------------------------------------
-# templating stuff
-
-sub tt {
-    my ($self) = @_;
-
-    return $self->{tt} if $self->{tt};
-
-    $self->{tt} = Template->new({
-        INCLUDE_PATH => $self->cfg_value('tt_dir'),
-    });
-    return $self->{tt};
-}
-
-sub stash_set {
-    my ($self, $key, $value) = @_;
-    $self->{stash}{$key} = $value;
-}
-
-sub stash_add {
-    my ($self, $key, $value) = @_;
-    $self->{stash}{$key} ||= [];
-    push @{$self->{stash}}, $value;
-}
-
-sub stash_params {
-    my ($self, @params) = @_;
-    my $param = $self->req_params();
-    foreach my $name ( @params ) {
-        $self->stash_set( $name, $param->{$name} )
-            if $param->{$name};
-    }
-}
-
-sub stash_del {
-    my ($self, $key) = @_;
-    delete $self->{stash}{$key};
-}
-
-sub stash_clear {
-    my ($self) = @_;
-    $self->{stash} = {};
-}
 
 sub res_add_header {
     my ($self, $field, $value) = @_;
@@ -414,7 +176,7 @@ sub render_template {
         unless defined $template_name;
 
     # pass ourself (a conduit object) to the template, so it can get things
-    $self->stash_set('conduit', $self);
+    $self->tt_stash_set('conduit', $self);
 
     # since rendering the Template could die, render first to a variable
     # then call the render_content method

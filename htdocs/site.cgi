@@ -5,7 +5,6 @@ use strict;
 use warnings;
 
 use AppsAttic::Conduit;
-# use CGI::Fast qw(:standard start_ul);
 use CGI::Fast;
 
 ## ----------------------------------------------------------------------------

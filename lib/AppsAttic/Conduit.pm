@@ -2,9 +2,8 @@
 
 package AppsAttic::Conduit;
 
-use strict;
-use warnings;
-use base 'CGI::Conduit';
+use Moose;
+extends 'CGI::Conduit';
 
 ## ----------------------------------------------------------------------------
 
