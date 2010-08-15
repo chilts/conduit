@@ -3,7 +3,7 @@
 package CGI::Conduit::Session;
 
 use Carp qw(croak);
-use Cache::Memcached;
+use String::Random::NiceURL qw(id);
 
 use Moose::Role;
 
@@ -109,6 +109,12 @@ sub session_del {
     $self->cookie_del( q{session} );
     delete $self->cookie->{session};
     $self->session_clear();
+}
+
+sub session_clear {
+    my ($self) = @_;
+    delete $self->{session};
+    delete $self->{session_id};
 }
 
 after 'clear' => sub {
