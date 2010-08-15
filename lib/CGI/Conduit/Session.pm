@@ -12,6 +12,10 @@ with 'CGI::Conduit::Cookie';
 
 ## ----------------------------------------------------------------------------
 
+has 'session_id' => ( is => 'rw' );
+
+## ----------------------------------------------------------------------------
+
 sub session {
     my ($self) = @_;
 
@@ -107,11 +111,11 @@ sub session_del {
     $self->session_clear();
 }
 
-sub session_clear {
+after 'clear' => sub {
     my ($self) = @_;
     delete $self->{session};
     delete $self->{session_id};
-}
+};
 
 ## ----------------------------------------------------------------------------
 1;

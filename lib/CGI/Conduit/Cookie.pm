@@ -50,10 +50,10 @@ sub cookie_del {
     $self->cookie_set($name, '', { expire => '-3d' } );
 }
 
-sub cookie_clear {
+after 'clear' => sub {
     my ($self, $name) = @_;
     $self->{cookie} = undef;
-}
+};
 
 ## ----------------------------------------------------------------------------
 1;

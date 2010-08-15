@@ -13,9 +13,7 @@ our $VERSION = '0.01';
 # accessors
 
 has 'cfg' => ( is => 'rw' );
-has 'stash' => ( is => 'rw' );
 has 'cgi' => ( is => 'rw' );
-has 'session_id' => ( is => 'rw' );
 has 'res_status' => ( is => 'rw' );
 has 'res_content' => ( is => 'rw' );
 has 'res_content_type' => ( is => 'rw' );
@@ -51,12 +49,8 @@ sub add_handler {
     push @{$self->{handler}}, { match => $match, name => $handler };
 }
 
-sub reset {
-    my ($self) = @_;
-    # don't do: cfg, dbh, memcache, redis or tt
-    $self->cookie_clear();
-    $self->session_clear();
-    $self->tt_clear();
+sub clear {
+    my $self = shift;
     $self->rendered(0);
 }
 
@@ -64,7 +58,7 @@ sub handle {
     my ($self, $cgi) = @_;
 
     # clear everything we know then set the cgi object
-    $self->reset();
+    $self->clear();
     $self->cgi($cgi);
 
     eval {

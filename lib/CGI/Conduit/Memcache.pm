@@ -30,6 +30,8 @@ sub memcache {
 
 # sub memcache_incr (so we don't have to write the weird stuff all the time)
 
+after 'clear' => sub { };
+
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------
