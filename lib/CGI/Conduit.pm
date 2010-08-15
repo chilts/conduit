@@ -18,6 +18,7 @@ our $VERSION = '0.01';
 # accessors
 
 has 'cgi' => ( is => 'rw' );
+has 'params_save' => ( is => 'rw' );
 has 'res_status' => ( is => 'rw' );
 has 'res_content' => ( is => 'rw' );
 has 'res_content_type' => ( is => 'rw' );
@@ -55,6 +56,7 @@ sub add_handler {
 
 sub clear {
     my $self = shift;
+    $self->params_save(undef);
     $self->rendered(0);
 }
 
@@ -214,6 +216,9 @@ sub req_param {
 sub req_params {
     my ($self) = @_;
 
+    # if we already have it, return it and don't compute it again
+    return $self->params_save if $self->params_save();
+
     # Note: this returns a copy of the hash (and not a tied hash, which we don't want)
     my %params = $self->cgi->Vars;
 
@@ -242,6 +247,9 @@ sub req_params {
         # use of -1 means don't strip trailing empty slots
         $params{$param} = [ split('\0', $params{$param}, -1) ];
     }
+
+    # save for next time and return it
+    $self->params_save( \%params );
     return \%params;
 }
 
