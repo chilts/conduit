@@ -82,10 +82,11 @@ sub dispatch {
 
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
+        # warn "trying: '$handler->{match}'";
         if ( ref $handler->{match} eq 'Regexp' ) {
-            if ( $path =~ $handler->{match} ) {
+            if ( my @matches = $path =~ $handler->{match} ) {
                 my $name = $handler->{name};
-                $self->$name();
+                $self->$name( @matches ? @matches : $path );
                 return;
             }
         }
@@ -93,7 +94,7 @@ sub dispatch {
             foreach my $redirect_path ( @{$handler->{match}} ) {
                 if ( $redirect_path eq $path ) {
                     my $name = $handler->{name};
-                    $self->$name();
+                    $self->$name( $path );
                     return;
                 }
             }
@@ -101,7 +102,7 @@ sub dispatch {
         elsif ( ref $handler->{match} eq 'HASH' ) {
             if ( exists $handler->{match}{$path} ) {
                 my $name = $handler->{name};
-                $self->$name();
+                $self->$name( $path );
                 return;
             }
         }
