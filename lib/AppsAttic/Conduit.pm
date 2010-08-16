@@ -31,6 +31,7 @@ sub setup_handlers {
     $self->add_handler( '/debug', 'debug' );
     $self->add_handler( '/memcache', 'page_memcache' );
     $self->add_handler( '/cookie', 'page_cookie' );
+    $self->add_handler( '/cookie/del', 'page_cookie_del' );
     $self->add_handler( '/session', 'page_session' );
     $self->add_handler( '/session/new', 'page_session_new' );
     $self->add_handler( '/session/invalid', 'page_session_set_invalid' );
@@ -116,6 +117,35 @@ sub page_cookie {
     else {
         # create a new cookie with count as one
         $self->cookie_set( q{count}, 1 );
+    }
+
+    # now render the template
+    $self->tt_stash_set('title', 'Cookie Information');
+    $self->render_template( q{cookie.html} );
+}
+
+sub page_cookie_del {
+    my ($self) = @_;
+
+    my $name = $self->req_param('name');
+    warn "name=$name";
+
+    unless ( defined $name ) {
+        $self->tt_stash_set( 'err', 'No cookie name provided' );
+        $self->render_template( q{cookie.html} );
+        return;
+    }
+
+    # read the cookie
+    my $cookie = $self->cookie_get($name);
+    if ( defined $cookie ) {
+        # cookie does exist, so delete it
+        $self->cookie_del( $name );
+        $self->tt_stash_set( 'msg', qq{Cookie '$name' deleted} );
+    }
+    else {
+        # no cookie
+        $self->tt_stash_set( 'err', qq{Cookie '$name' doesn't exist} );
     }
 
     # now render the template

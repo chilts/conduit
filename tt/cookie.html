@@ -4,6 +4,16 @@
 
 <h1>Cookie Monster</h1>
 
+[
+  <a href="/cookie">Cookie</a>
+  |
+  <a href="/cookie/del?name=count">Delete Count Cookie</a>
+  |
+  <a href="/cookie/del?name=session">Delete Session Cookie</a>
+  |
+  <a href="/cookie/del?name=success">Delete Success Cookie</a>
+]
+
 <p>Cookies</p>
 <pre>
 [% Dumper.dump(conduit.cookie) | html %]
