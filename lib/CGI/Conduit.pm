@@ -267,6 +267,7 @@ sub http_temp_redirect {
     print $self->cgi->redirect(
         -uri    => $url,
         -status => 302,
+        -cookie => $self->res_cookie,
     );
 }
 
@@ -275,6 +276,7 @@ sub http_moved_permanently {
     print $self->cgi->redirect(
         -uri    => $url,
         -status => 301,
+        -cookie => $self->res_cookie,
     );
 }
 
