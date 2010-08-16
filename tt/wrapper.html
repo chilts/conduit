@@ -19,6 +19,13 @@
 
 <div id="content" style="margin-left: 230px">
 
+[% IF err %]
+  <p class="err" style="color: red;">[% err | html %]</p>
+[% END %]
+[% IF msg %]
+  <p class="msg" style="color: green;">[% msg | html %]</p>
+[% END %]
+
   [% content %]
 
 </div>
