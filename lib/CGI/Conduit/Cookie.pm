@@ -52,7 +52,8 @@ sub cookie_del {
 
 after 'clear' => sub {
     my ($self, $name) = @_;
-    $self->{cookie} = undef;
+    delete $self->{cookie};
+    delete $self->{res_cookie};
 };
 
 ## ----------------------------------------------------------------------------
