@@ -35,6 +35,15 @@ sub tt_stash_add {
     push @{$self->{stash}}, $value;
 }
 
+sub tt_stash_params {
+    my ($self, @params) = @_;
+    foreach my $name ( @params ) {
+        my $value = $self->req_param($name);
+        next unless defined $value;
+        $self->tt_stash_set( $name, $value );
+    }
+}
+
 sub tt_stash_del {
     my ($self, $key) = @_;
     delete $self->{stash}{$key};
