@@ -42,6 +42,8 @@ sub session {
         return;
     }
 
+    warn qq{session(): found session id '$id'};
+
     # remember the session and it's id
     $self->session_id( $id );
     $self->{session} = $session;
@@ -68,6 +70,8 @@ sub session_new {
         warn "session_new(): Trying to set session $id failed";
         return;
     }
+
+    warn "session_new(): Setting new session '$id'";
 
     # setting the session worked, so set the appropriate bits and return the id
     $self->cookie_set( q{session}, $id );
