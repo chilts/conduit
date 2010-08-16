@@ -139,6 +139,12 @@ sub res_header {
     );
 }
 
+sub res_no_cache {
+    my ($self) = @_;
+    push @{$self->{res_hdr}}, '-Pragma', 'no-cache';
+    push @{$self->{res_hdr}}, '-Cache-control', 'no-cache';
+}
+
 sub render_final {
     my ($self) = @_;
 
