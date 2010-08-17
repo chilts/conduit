@@ -8,6 +8,7 @@ use Carp qw(croak);
 
 # use the core roles
 with qw(
+    CGI::Conduit::Status
     CGI::Conduit::Cfg
     CGI::Conduit::Cookie
 );
@@ -19,7 +20,6 @@ our $VERSION = '0.01';
 
 has 'cgi' => ( is => 'rw' );
 has 'params_save' => ( is => 'rw' );
-has 'res_status' => ( is => 'rw' );
 has 'res_content' => ( is => 'rw' );
 has 'res_content_type' => ( is => 'rw' );
 has 'rendered' => ( is => 'rw' );
@@ -73,7 +73,7 @@ sub handle {
     if ( $@ ) {
         # if we are here, something went wrong, so serve a 500
         warn "Application died: $@";
-        $self->http_internal_server_error();
+        $self->status_internal_server_error();
     }
 }
 
@@ -117,7 +117,7 @@ sub dispatch {
     }
 
     # if we are here, then we haven't been told what to do, 404 it
-    $self->http_not_found();
+    $self->status_not_found();
 }
 
 ## ----------------------------------------------------------------------------
@@ -127,14 +127,13 @@ sub res_add_header {
     push @{$self->{res_hdr}}, "-$field", $value;
 }
 
-# res_status
 # res_content_type
 
 sub res_header {
     my ($self) = @_;
     print $self->cgi->header(
         -type   => $self->res_content_type || 'text/html; charset=utf-8',
-        -status => $self->res_status || 200,
+        -status => $self->status || 200,
         -cookie => $self->res_cookie,
         @{$self->{res_hdr}},
     );
@@ -258,39 +257,6 @@ sub req_params {
     # save for next time and return it
     $self->params_save( \%params );
     return \%params;
-}
-
-## ----------------------------------------------------------------------------
-# easy canned responses
-
-sub http_temp_redirect {
-    my ($self, $url) = @_;
-    print $self->cgi->redirect(
-        -uri    => $url,
-        -status => 302,
-        -cookie => $self->res_cookie,
-    );
-}
-
-sub http_moved_permanently {
-    my ($self, $url) = @_;
-    print $self->cgi->redirect(
-        -uri    => $url,
-        -status => 301,
-        -cookie => $self->res_cookie,
-    );
-}
-
-sub http_not_found {
-    my ($self) = @_;
-    $self->res_status(404);
-    $self->render_template( q{404.html} );
-}
-
-sub http_internal_server_error {
-    my ($self) = @_;
-    $self->res_status(500);
-    $self->render_template( q{500.html} );
 }
 
 ## ----------------------------------------------------------------------------

@@ -66,7 +66,7 @@ sub home {
 sub section_redirect {
     my ($self) = @_;
 
-    $self->http_moved_permanently( $self->req_path . '/' );
+    $self->status_moved_permanently( $self->req_path . '/' );
 }
 
 sub blog_entry {
