@@ -49,6 +49,18 @@ sub tt_stash_del {
     delete $self->{stash}{$key};
 }
 
+sub tt_pluralise {
+    my ($self, $count, $singular, $plural) = @_;
+
+    return "no " . ($plural || $singular)
+        if $count == 0;
+
+    return "1 $singular"
+        if $count == 1;
+
+    return "$count " . ($plural || $singular);
+}
+
 after 'clear' => sub {
     my ($self) = @_;
     $self->{stash} = {};
