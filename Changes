@@ -1,4 +1,7 @@
 Revision history for CGI-Conduit
 
+0.02    Fri Aug 20 2010
+        Now has the CGI::Conduit::Log role.
+
 0.01    Fri Aug 13 2010
         First version.
