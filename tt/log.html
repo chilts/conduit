@@ -1,0 +1,21 @@
+[% WRAPPER 'layout-main.html' %]
+
+<h1>Log Stuff</h1>
+
+<p>[
+  <a href="/log?msg=Hello,+World!">Log &quot;Hello, World!&quot;</a>
+  |
+  <a href="/log?msg=RAH!">Log &quot;RAH!&quot;</a>
+  |
+  <a href="/log?msg=Humbug">Log &quot;Humbug&quot;</a>
+]</p>
+
+<p style="color: green;">[% msg | html %]</p>
+
+<h2>Type Your Own Message</h2>
+
+<form method="GET" action="?">
+  Message: <input type="text" name="msg" /> <input type="submit" value="Log a Message" />
+</form>
+
+[% END %]

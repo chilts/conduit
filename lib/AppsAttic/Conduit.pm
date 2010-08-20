@@ -10,8 +10,11 @@ with qw(
     CGI::Conduit::Cookie
     CGI::Conduit::Session
     CGI::Conduit::Memcache
+    CGI::Conduit::Log
     CGI::Conduit::Template
 );
+
+use Log::Log4perl qw(get_logger);
 
 ## ----------------------------------------------------------------------------
 
@@ -37,6 +40,7 @@ sub setup_handlers {
     $self->add_handler( '/session/invalid', 'page_session_set_invalid' );
     $self->add_handler( '/session/unknown', 'page_session_set_unknown' );
     $self->add_handler( '/session/del', 'page_session_del' );
+    $self->add_handler( '/log', 'page_log' );
     $self->add_handler( '/cgi', 'page_cgi' );
 
     return;
@@ -213,7 +217,7 @@ sub page_session_del {
 sub page_session_set_invalid {
     my ($self) = @_;
 
-    $self->cookie_set( q{session}, 'Invalid session value/id');
+    $self->cookie_set( q{session}, '^*&@{}":;,./<>?');
 
     # now render the template
     $self->tt_stash_set('title', 'Sessional');
@@ -230,6 +234,19 @@ sub page_session_set_unknown {
     $self->tt_stash_set('title', 'Sessional');
     $self->tt_stash_set('msg', 'Valid session id, but unknown session set');
     $self->render_template( q{session.html} );
+}
+
+sub page_log {
+    my ($self) = @_;
+
+    my $msg = $self->req_param('msg');
+
+    my $log = get_logger();
+    $log->info(qq{Someone said: $msg});
+
+    $self->tt_stash_set('title', 'Log Stuff');
+    $self->tt_stash_set('msg', qq{You just logged: $msg});
+    $self->render_template( q{log.html} );
 }
 
 ## ----------------------------------------------------------------------------

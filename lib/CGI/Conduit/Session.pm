@@ -9,6 +9,9 @@ use Moose::Role;
 
 with 'CGI::Conduit::Memcache';
 with 'CGI::Conduit::Cookie';
+with 'CGI::Conduit::Log';
+
+use Log::Log4perl qw(get_logger);
 
 ## ----------------------------------------------------------------------------
 
@@ -26,10 +29,12 @@ sub session {
     my $cookie = $self->cookie_get('session');
     return unless defined $cookie;
 
+    my $log = get_logger();
+
     # get the cookie value which is the session id and check it for validity
     my $id = $cookie->value();
     unless ( $self->is_session_id_valid($id) ) {
-        warn qq{session(): session id '$id' invalid};
+        $log->warn(qq{session(): session id '$id' invalid});
         $self->cookie_del( q{session} );
         return;
     }
@@ -37,12 +42,12 @@ sub session {
     # retrieve the session
     my $session = $self->session_get( $id );
     unless ( defined $session ) {
-        warn qq{session(): session id '$id' doesn't exist};
+        $log->warn(qq{session(): session id '$id' doesn't exist});
         $self->cookie_del( q{session} );
         return;
     }
 
-    warn qq{session(): found session id '$id'};
+    $log->debug(qq{session(): found session id '$id'});
 
     # remember the session and it's id
     $self->session_id( $id );
@@ -61,17 +66,22 @@ sub is_session_id_valid {
 sub session_new {
     my ($self, $value) = @_;
 
-    croak qq{Trying to set a session to undef}
-        unless $value;
+    unless ( $value ) {
+        my $log = get_logger();
+        $log->fatal(qq{Trying to set a session to undef});
+        croak qq{Trying to set a session to undef}
+    }
+
+    my $log = get_logger();
 
     my $id = id(32);
     my $mc = $self->memcache();
     unless ( $mc->set("session:$id", $value) ) {
-        warn "session_new(): Trying to set session $id failed";
+        $log->warn("session_new(): Trying to set session $id failed");
         return;
     }
 
-    warn "session_new(): Setting new session '$id'";
+    $log->debug("session_new(): Setting new session '$id'");
 
     # setting the session worked, so set the appropriate bits and return the id
     $self->cookie_set( q{session}, $id );
@@ -83,8 +93,11 @@ sub session_new {
 sub session_set {
     my ($self, $id, $value) = @_;
 
-    croak qq{Trying to set a session to undef}
-        unless $value;
+    unless ( $value ) {
+        my $log = get_logger();
+        $log->fatal(qq{Trying to set a session to undef});
+        croak qq{Trying to set a session to undef};
+    }
 
     my $mc = $self->memcache();
     $mc->set("session:$id", $value);
@@ -102,8 +115,9 @@ sub session_del {
     my ($self) = @_;
 
     unless ( $self->session ) {
+        my $log = get_logger();
+        $log->fatal("session_del(): trying to delete a session which doesn't (yet) exist");
         croak "session_del(): trying to delete a session which doesn't (yet) exist";
-        return;
     }
 
     my $id = $self->session_id();

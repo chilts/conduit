@@ -11,6 +11,7 @@ with qw(
     CGI::Conduit::Status
     CGI::Conduit::Cfg
     CGI::Conduit::Cookie
+    CGI::Conduit::Log
 );
 
 our $VERSION = '0.01';
@@ -25,7 +26,7 @@ has 'res_content_type' => ( is => 'rw' );
 has 'rendered' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
-# setup, handlers dispatchers and suchlike
+# setup and initialisation
 
 sub setup {
     my ($self, $filename) = @_;
@@ -40,7 +41,14 @@ sub setup {
     # set the config
     $self->cfg( $filename );
 
-    # this should be provided by the inheriting class
+    # finally, call the init function (which some roles hook using 'after')
+    $self->init();
+}
+
+sub init {
+    my $self = shift;
+
+    # 'setup_handlers' should be provided by the inheriting class
     $self->setup_handlers();
 }
 
@@ -48,16 +56,19 @@ sub setup_handlers {
     die 'setup_handlers(): should be provided by the inheriting class';
 }
 
-sub add_handler {
-    my ($self, $match, $handler) = @_;
-
-    push @{$self->{handler}}, { match => $match, name => $handler };
-}
-
 sub clear {
     my $self = shift;
     $self->params_save(undef);
     $self->rendered(0);
+}
+
+## ----------------------------------------------------------------------------
+# handle stuff
+
+sub add_handler {
+    my ($self, $match, $handler) = @_;
+
+    push @{$self->{handler}}, { match => $match, name => $handler };
 }
 
 sub handle {
@@ -71,8 +82,10 @@ sub handle {
         $self->dispatch();
     };
     if ( $@ ) {
-        # if we are here, something went wrong, so serve a 500
-        warn "Application died: $@";
+        # something went wrong, log it to both serverlog and ours and serve a 500
+        my $msg = qq{Application died: $@};
+        $log->fatal( $msg );;
+        warn $msg;
         $self->status_internal_server_error();
     }
 }
