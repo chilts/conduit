@@ -16,7 +16,7 @@ with qw(
 
 use Log::Log4perl qw(get_logger);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ## ----------------------------------------------------------------------------
 # accessors
