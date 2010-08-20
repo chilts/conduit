@@ -14,6 +14,8 @@ with qw(
     CGI::Conduit::Log
 );
 
+use Log::Log4perl qw(get_logger);
+
 our $VERSION = '0.01';
 
 ## ----------------------------------------------------------------------------
@@ -84,6 +86,7 @@ sub handle {
     if ( $@ ) {
         # something went wrong, log it to both serverlog and ours and serve a 500
         my $msg = qq{Application died: $@};
+        my $log = get_logger();
         $log->fatal( $msg );;
         warn $msg;
         $self->status_internal_server_error();
