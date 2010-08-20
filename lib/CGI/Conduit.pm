@@ -273,14 +273,34 @@ Version 0.01
 
 =head1 SYNOPSIS
 
-    use AppsAttic::Conduit;
+    use MyWebsite;
     use CGI::Fast;
 
-    my $app = AppsAttic::Conduit->new();
+    my $app = MyWebsite->new();
     $app->setup();
     while ( my $cgi = CGI::Fast->new() ) {
         $app->handle($cgi);
     }
+
+Meanwhile ...
+
+    package MyWebsite;
+    use Moose;
+    extends 'CGI::Conduit';
+
+    with qw(); # add other CGI::Conduit::* roles you need here
+
+    sub setup_handlers {
+        my ($self) = @_;
+        $self->add_handler( '/', 'page_home' );
+    }
+
+    sub page_home {
+        my ($self) = @_;
+        $self->render_content('<p>Hello, World!</p>');
+    }
+
+    1;
 
 =head1 DESCRIPTION
 
@@ -289,8 +309,9 @@ only a config file. This includes things like connections to your database,
 memcache servers, redis, use of Template::Toolkit, and finally cookie and
 session dealings.
 
-Many things are 'baked' in at the moment (ie. the things I like) but am ready
-to split these off into separate roles so things can be mixed and matched.
+There are some core roles in CGI::Conduit::* but also some optional ones
+too. If you need any of these, just make sure you include the role in your
+application module as above.
 
 =head1 BUGS
 
@@ -300,8 +321,6 @@ This section is left intentionally blank.
 
 Currently there is none since this module isn't yet officially released, but
 you can email me if you like.
-
-=back
 
 =head1 AUTHOR, COPYRIGHT & LICENSE
 
