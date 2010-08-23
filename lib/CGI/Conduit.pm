@@ -17,7 +17,7 @@ with qw(
 
 use Log::Log4perl qw(get_logger);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ## ----------------------------------------------------------------------------
 # accessors
@@ -265,7 +265,7 @@ CGI::Conduit - base class for nice CGI::Fast web applications
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
