@@ -46,7 +46,12 @@ sub pg {
     return $self->pg_dbh;
 }
 
-after 'clear' => sub { };
+after 'clear' => sub {
+    # if we're not in a transaction, nothing to do
+    return if $self->pg->{AutoCommit};
+    # we're in a transaction so we've borked, roll it back
+    $self->pg->rollback();
+};
 
 ## ----------------------------------------------------------------------------
 1;
