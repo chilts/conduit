@@ -8,6 +8,7 @@ use Carp qw(croak);
 
 # use the core roles
 with qw(
+    CGI::Conduit::Header
     CGI::Conduit::Status
     CGI::Conduit::Cfg
     CGI::Conduit::Cookie
@@ -138,28 +139,7 @@ sub dispatch {
 
 ## ----------------------------------------------------------------------------
 
-sub res_add_header {
-    my ($self, $field, $value) = @_;
-    push @{$self->{res_hdr}}, "-$field", $value;
-}
-
 # res_content_type
-
-sub res_header {
-    my ($self) = @_;
-    print $self->cgi->header(
-        -type   => $self->res_content_type || 'text/html; charset=utf-8',
-        -status => $self->status || 200,
-        -cookie => $self->res_cookie,
-        @{$self->{res_hdr}},
-    );
-}
-
-sub res_no_cache {
-    my ($self) = @_;
-    push @{$self->{res_hdr}}, '-Pragma', 'no-cache';
-    push @{$self->{res_hdr}}, '-Cache-control', 'no-cache';
-}
 
 sub render_final {
     my ($self) = @_;
@@ -169,7 +149,7 @@ sub render_final {
         if $self->rendered();
 
     # headers first, then content, then remember we've done it
-    $self->res_header();
+    $self->hdr_render();
     print $self->res_content;
     $self->rendered(1);
 }

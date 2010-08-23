@@ -42,6 +42,7 @@ sub setup_handlers {
     $self->add_handler( '/session/del', 'page_session_del' );
     $self->add_handler( '/log', 'page_log' );
     $self->add_handler( '/cgi', 'page_cgi' );
+    $self->add_handler( '/header', 'page_header' );
 
     return;
 
@@ -163,6 +164,16 @@ sub page_cgi {
     # now render the template
     $self->tt_stash_set('title', 'CGI Info');
     $self->render_template( q{cgi.html} );
+}
+
+sub page_header {
+    my ($self) = @_;
+
+    $self->hdr_no_cache();
+
+    # now render the template
+    $self->tt_stash_set('title', 'Header - no cache');
+    $self->render_template( q{header.html} );
 }
 
 sub page_session {
