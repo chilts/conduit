@@ -47,6 +47,8 @@ sub pg {
 }
 
 after 'clear' => sub {
+    my ($self) = @_;
+
     # if we're not in a transaction, nothing to do
     return if $self->pg->{AutoCommit};
     # we're in a transaction so we've borked, roll it back
