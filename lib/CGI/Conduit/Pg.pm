@@ -46,6 +46,11 @@ sub pg {
     return $self->pg_dbh;
 }
 
+sub db_row {
+    my ($self, $sql, @params) = @_;
+    return $self->pg->selectrow_hashref( $sql, undef, @params );
+}
+
 after 'clear' => sub {
     my ($self) = @_;
 
