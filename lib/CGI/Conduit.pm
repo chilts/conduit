@@ -62,6 +62,7 @@ sub setup_handlers {
 sub clear {
     my $self = shift;
     $self->params_save(undef);
+    delete $self->{res_content_type};
     $self->rendered(0);
 }
 
