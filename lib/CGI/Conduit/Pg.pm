@@ -8,6 +8,8 @@ use DBI;
 
 ## ----------------------------------------------------------------------------
 
+use constant NO_SLICE => { Slice => {} };
+
 has 'pg_dbh' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
@@ -46,9 +48,19 @@ sub pg {
     return $self->pg_dbh;
 }
 
-sub db_row {
+sub pg_row {
     my ($self, $sql, @params) = @_;
     return $self->pg->selectrow_hashref( $sql, undef, @params );
+}
+
+sub pg_rows {
+    my ($self, $sql, @params) = @_;
+    return $self->pg->selectall_arrayref($sql, NO_SLICE, @params );
+}
+
+sub pg_do {
+    my ($self, $sql, @params) = @_;
+    return $self->pg->do($sql, undef, @params );
 }
 
 after 'clear' => sub {
