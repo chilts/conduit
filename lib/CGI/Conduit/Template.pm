@@ -20,6 +20,7 @@ sub tt {
 
     $self->{tt} = Template->new({
         INCLUDE_PATH => $self->cfg_value('tt_dir'),
+        ($self->cfg_value('tt_pre_process') ? (PRE_PROCESS => $self->cfg_value('tt_pre_process')) : ()),
     });
     return $self->{tt};
 }
