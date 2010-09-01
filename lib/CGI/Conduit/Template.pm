@@ -53,6 +53,7 @@ sub tt_stash_del {
 sub tt_pluralise {
     my ($self, $count, $singular, $plural) = @_;
 
+    $count ||= 0;
     return "no " . ($plural || $singular)
         if $count == 0;
 
