@@ -3,8 +3,7 @@
 package CGI::Conduit;
 
 use Moose;
-
-use Carp qw(croak);
+use Log::Log4perl qw(get_logger);
 
 # use the core roles
 with qw(
@@ -14,8 +13,6 @@ with qw(
     CGI::Conduit::Cookie
     CGI::Conduit::Log
 );
-
-use Log::Log4perl qw(get_logger);
 
 our $VERSION = '0.03';
 
