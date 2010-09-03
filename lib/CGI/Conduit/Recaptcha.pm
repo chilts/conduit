@@ -20,12 +20,23 @@ EOF
 my $ajax_challenge_html = <<'EOF';
   <script type="text/javascript" src="//www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
   <script type="text/javascript">
-  // when the user goes to fill in the comment field, show the reCAPTCHA (doesn't show on input[type=checkbox], but we're not too worried
-  $('#__Form__ input, #__Form__ textarea').focus(function(event) {
-    // create the reCAPTCHA, but don't call the { callback: Recaptcha.focus_response_field } since we don't want it focussed
-    Recaptcha.create( "__PubKey__", "__ID__", { theme: "__Theme__" } );
+// when the user goes to fill in the comment field, show the reCAPTCHA (doesn't show on input[type=checkbox], but we're not too worried
+$('#__Form__ input, #__Form__ textarea').focus(function(event) {
+    // create the reCAPTCHA but only if it doesn't exist yet
+    if ( ! $('#recaptcha_response_field').length ) {
+        Recaptcha.create( "__PubKey__", "__ID__", { theme: "__Theme__" } );
+    }
     // now remove this focus event so it doesn't fire again (see http://api.jquery.com/unbind/)
     $('#__Form__ input, #__Form__ textarea').unbind( event );
+});
+
+// this is for special cases where the user submits without inputting _anything_ at all
+$('#__Form__').submit(function() {
+    // if there is no #recaptcha_response_field, then show the reCAPTCHA
+    if ( ! $('#recaptcha_response_field').length ) {
+        Recaptcha.create( "__PubKey__", "__ID__", { theme: "__Theme__" } );
+        return false;
+    }
 });
 </script>
 EOF
