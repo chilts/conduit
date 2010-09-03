@@ -33,22 +33,21 @@ sub convert_text_to_scrubbed_html {
     # remove weird \r chars
     $text =~ s{\r+}{}gxms;
 
-    # firstly, add some <p> tags to the appropriate places
-    #$log->debug('-' x 79);
-    #$log->debug($text);
-
     # split up and rejoin each paragraph (no matter how many \n's between them)
     my @paras = split( m{\n+}xms, $text );
     my $html = '<p>' . join( "</p>\n<p>", @paras ) . '</p>';
-
-    #$log->debug('-' x 79);
-    #$log->debug($html);
-    #$log->debug('-' x 79);
 
     # now, scrub the HTML so it'll be nice
     $html = $scrubber->scrub($html);
 
     return $html;
+}
+
+sub convert_remove_newlines {
+    my ($self, $text) = @_;
+    # replace each set with a single space
+    $text =~ s{[\r\n]+}{ }gxms;
+    return $text;
 }
 
 after 'clear' => sub { };
