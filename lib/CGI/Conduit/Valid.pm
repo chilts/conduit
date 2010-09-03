@@ -14,6 +14,7 @@ sub valid_int {
 
 sub valid_something {
     my ($self, $something) = @_;
+    return unless defined $something;
     return 1 if $something =~ m{ \S }xms;
     return;
 }
