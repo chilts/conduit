@@ -21,11 +21,11 @@ my $ajax_challenge_html = <<'EOF';
   <script type="text/javascript" src="//www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
   <script type="text/javascript">
   // when the user goes to fill in the comment field, show the reCAPTCHA (doesn't show on input[type=checkbox], but we're not too worried
-  $('__Form__ input, __Form__ textarea').focus(function(event) {
+  $('#__Form__ input, #__Form__ textarea').focus(function(event) {
     // create the reCAPTCHA, but don't call the { callback: Recaptcha.focus_response_field } since we don't want it focussed
     Recaptcha.create( "__PubKey__", "__ID__", { theme: "__Theme__" } );
     // now remove this focus event so it doesn't fire again (see http://api.jquery.com/unbind/)
-    $('#comment-form input, #comment-form textarea').unbind( event );
+    $('#__Form__ input, #__Form__ textarea').unbind( event );
 });
 </script>
 EOF
@@ -50,7 +50,7 @@ sub recaptcha_standard_challenge_html {
 
 # From: http://code.google.com/apis/recaptcha/docs/display.html
 sub recaptcha_ajax_html {
-    my ($self, $theme, $form, $id) = @_;
+    my ($self, $theme, $form_id, $id) = @_;
 
     $theme ||= 'red';
 
@@ -61,7 +61,7 @@ sub recaptcha_ajax_html {
     my $html = $ajax_challenge_html;
     $html =~ s{__PubKey__}{$public_key}gxms;
     $html =~ s{__Theme__}{$theme}gxms;
-    $html =~ s{__Form__}{$form}gxms;
+    $html =~ s{__Form__}{$form_id}gxms;
     $html =~ s{__ID__}{$id}gxms;
     return $html;
 }
