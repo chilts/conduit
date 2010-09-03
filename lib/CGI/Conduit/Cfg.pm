@@ -22,6 +22,12 @@ sub cfg {
     return $self->cfg_obj;
 }
 
+sub cfg_hash {
+    my ($self) = @_;
+    my %cfg = $self->cfg_obj->vars();
+    return \%cfg;
+}
+
 sub cfg_value {
     my ($self, $key) = @_;
     return $self->cfg_obj->param($key);
