@@ -3,6 +3,8 @@
 package CGI::Conduit::Recaptcha;
 use Moose::Role;
 
+use LWP::UserAgent;
+
 ## ----------------------------------------------------------------------------
 
 my $standard_challenge_html = <<'EOF';
@@ -27,6 +29,8 @@ my $ajax_challenge_html = <<'EOF';
 });
 </script>
 EOF
+
+my $verify_url = q{http://www.google.com/recaptcha/api/verify};
 
 # From: http://code.google.com/apis/recaptcha/docs/display.html
 sub recaptcha_standard_challenge_html {
@@ -60,6 +64,39 @@ sub recaptcha_ajax_html {
     $html =~ s{__Form__}{$form}gxms;
     $html =~ s{__ID__}{$id}gxms;
     return $html;
+}
+
+sub recaptcha_verify {
+    my ($self, $challenge, $response) = @_;
+
+    my $private_key = $self->cfg_value( q{recaptcha_private_key} );
+    my $remote_ip = $self->req_remote_ip();
+
+    my $ua = LWP::UserAgent->new();
+    my $resp = $ua->post(
+        $verify_url,
+        {
+            privatekey => $self->cfg_value( q{recaptcha_private_key} ),
+            remoteip   => $self->req_remote_ip(),
+            challenge  => $challenge,
+            response   => $response,
+        },
+    );
+
+    # see if the verify request was ok
+    unless ( $resp->is_success ) {
+        # request failed
+        return { valid => 0, error => 'Server Error.' };
+    }
+    my ( $valid, $error ) = split( /\n/, $resp->content, 2 );
+
+    # all ok?
+    return { valid => 1 }
+        if $valid eq 'true';
+
+    # something went wrong (either the user entered wrong, or something else)
+    chomp $error;
+    return { valid => 0, error => $error };
 }
 
 after 'clear' => sub { };
