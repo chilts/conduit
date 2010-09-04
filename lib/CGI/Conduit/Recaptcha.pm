@@ -7,6 +7,19 @@ use LWP::UserAgent;
 
 ## ----------------------------------------------------------------------------
 
+my $msgs = {
+    unknown => 'Unknown error.',
+    invalid-site-public-key	=> 'Unable to verify public key.',
+    invalid-site-private-key => 'Unable to verify private key.',
+    invalid-request-cookie => 'The challenge parameter of the verify script was incorrect.',
+    incorrect-captcha-sol => 'The CAPTCHA solution was incorrect.',
+    verify-params-incorrect => 'Incorrect params when verifying.',
+    invalid-referrer => 'reCAPTCHA API keys are tied to a specific domain name for security reasons.',
+    recaptcha-not-reachable => 'reCAPTCHA never returns this error code. A plugin should manually return this code in the unlikely event that it is unable to contact the reCAPTCHA verify server.'
+};
+
+## ----------------------------------------------------------------------------
+
 my $standard_challenge_html = <<'EOF';
   <script type="text/javascript"> var RecaptchaOptions = { theme : '__Theme__' }; </script>
   <script type="text/javascript" src="//www.google.com/recaptcha/api/challenge?k=__PubKey__"></script>
@@ -96,8 +109,9 @@ sub recaptcha_verify {
 
     # see if the verify request was ok
     unless ( $resp->is_success ) {
-        # request failed
-        return { valid => 0, error => 'Server Error.' };
+        # request failed, return 'recaptcha-not-reachable' as recommended by:
+        # * http://code.google.com/apis/recaptcha/docs/verify.html
+        return { valid => 0, error => 'recaptcha-not-reachable' };
     }
     my ( $valid, $error ) = split( /\n/, $resp->content, 2 );
 
