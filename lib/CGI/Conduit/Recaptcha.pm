@@ -8,14 +8,14 @@ use LWP::UserAgent;
 ## ----------------------------------------------------------------------------
 
 my $msgs = {
-    unknown => 'Unknown error.',
-    invalid-site-public-key	=> 'Unable to verify public key.',
-    invalid-site-private-key => 'Unable to verify private key.',
-    invalid-request-cookie => 'The challenge parameter of the verify script was incorrect.',
-    incorrect-captcha-sol => 'The CAPTCHA solution was incorrect.',
-    verify-params-incorrect => 'Incorrect params when verifying.',
-    invalid-referrer => 'reCAPTCHA API keys are tied to a specific domain name for security reasons.',
-    recaptcha-not-reachable => 'reCAPTCHA never returns this error code. A plugin should manually return this code in the unlikely event that it is unable to contact the reCAPTCHA verify server.'
+    'unknown'                  => 'Unknown error.',
+    'invalid-site-public-key'  => 'Unable to verify public key.',
+    'invalid-site-private-key' => 'Unable to verify private key.',
+    'invalid-request-cookie'   => 'The challenge parameter of the verify script was incorrect.',
+    'incorrect-captcha-sol'    => 'The CAPTCHA solution was incorrect.',
+    'verify-params-incorrect'  => 'Incorrect params when verifying.',
+    'invalid-referrer'         => 'reCAPTCHA API keys are tied to a specific domain name for security reasons.',
+    'recaptcha-not-reachable'  => 'reCAPTCHA never returns this error code. A plugin should manually return this code in the unlikely event that it is unable to contact the reCAPTCHA verify server.'
 };
 
 ## ----------------------------------------------------------------------------
@@ -122,6 +122,11 @@ sub recaptcha_verify {
     # something went wrong (either the user entered wrong, or something else)
     chomp $error;
     return { valid => 0, error => $error };
+}
+
+sub recaptcha_error {
+    my ($self, $code) = @_;
+    return $msgs->{$code};
 }
 
 after 'clear' => sub { };
