@@ -2,8 +2,6 @@
 
 package CGI::Conduit::Log;
 
-use Carp qw(croak);
-
 use Moose::Role;
 
 use Log::Log4perl;
