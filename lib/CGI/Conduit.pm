@@ -2,6 +2,7 @@
 
 package CGI::Conduit;
 
+use Carp;
 use Moose;
 use Log::Log4perl qw(get_logger);
 
@@ -29,22 +30,28 @@ has 'rendered' => ( is => 'rw' );
 # setup and initialisation
 
 sub setup {
-    my ($self, $filename) = @_;
+    my ($self, $cfg_filename, $log_filename) = @_;
 
-    # use either filename passed in or the the ENV
-    $filename ||= $ENV{CONDUIT_CFG};
+    # check the config filename is given (log filename is optional)
+    defined $cfg_filename
+        or croak "Config filename not given";
 
-    # check the file exists
-    -f $filename
-        or die "Config file doesn't exist: $!";
+    # check the config file exists
+    -f $cfg_filename
+        or croak "Config file doesn't exist: $!";
 
-    # set the config
-    $self->cfg( $filename );
+    # load up the config
+    $self->cfg_load( $cfg_filename );
 
-    # finally, call the init function (which some roles hook using 'after')
+    # set the log file (whether it is defined or not)
+    $self->log_filename( $log_filename );
+
+    # finally, call the init function (which some roles hook to 'after')
     $self->init();
 }
 
+# this should eventually be moved to 'setup', though the roles then need
+# changing so they hook into 'after setup' rather than 'after init'
 sub init {
     my $self = shift;
 

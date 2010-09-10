@@ -2,9 +2,9 @@
 
 package CGI::Conduit::Cfg;
 
+use Carp;
 use Moose::Role;
-
-use Config::Simple;
+use Projectus::Cfg qw(cfg_init);
 
 ## ----------------------------------------------------------------------------
 
@@ -12,11 +12,23 @@ has 'cfg_obj' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
 
+sub cfg_load {
+    my ($self, $filename) = @_;
+
+    unless ( defined $filename ) {
+        croak "No filename provided";
+    }
+
+    $self->cfg_obj( cfg_init($filename) );
+    # $self->cfg_obj( Config::Simple->new( $filename ) );
+    return $self->cfg_obj();
+}
+
 sub cfg {
     my ($self, $filename) = @_;
 
-    if ( defined $filename ) {
-        $self->cfg_obj( Config::Simple->new( $filename ) );
+    unless ( $self->cfg_obj ) {
+        croak "No config file loaded yet, use 'cfg_load' first";
     }
 
     return $self->cfg_obj;
