@@ -20,7 +20,6 @@ sub cfg_load {
     }
 
     $self->cfg_obj( cfg_init($filename) );
-    # $self->cfg_obj( Config::Simple->new( $filename ) );
     return $self->cfg_obj();
 }
 
