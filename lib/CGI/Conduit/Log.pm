@@ -11,6 +11,8 @@ has 'log_filename' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
 
+# for some reason, this is called twice in startup, even though init() is only
+# called once!!!
 after 'init' => sub {
     my ($self) = @_;
 
