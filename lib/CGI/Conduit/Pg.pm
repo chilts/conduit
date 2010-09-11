@@ -48,6 +48,28 @@ sub pg {
     return $self->pg_dbh;
 }
 
+sub pg_begin {
+    my ($self) = @_;
+    $self->pg->begin_work();
+}
+
+sub pg_commit {
+    my ($self) = @_;
+    $self->pg->commit();
+}
+
+sub pg_rollback {
+    my ($self) = @_;
+    $self->pg->rollback();
+}
+
+# returns the last insert ID
+sub pg_id {
+    my ($self, $sequence) = @_;
+    my ($id) = $self->pg->selectrow_array( "SELECT currval(? || '_id_seq')", undef, $sequence );
+    return $id;
+}
+
 sub pg_row {
     my ($self, $sql, @params) = @_;
     return $self->pg->selectrow_hashref( $sql, undef, @params );
