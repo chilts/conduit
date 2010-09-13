@@ -4,7 +4,7 @@ package CGI::Conduit::Cfg;
 
 use Carp;
 use Moose::Role;
-use Projectus::Cfg qw(cfg_init);
+use Projectus::Cfg qw(init_cfg);
 
 ## ----------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ sub cfg_load {
         croak "No filename provided";
     }
 
-    $self->cfg_obj( cfg_init($filename) );
+    $self->cfg_obj( init_cfg($filename) );
     return $self->cfg_obj();
 }
 

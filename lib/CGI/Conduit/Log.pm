@@ -3,7 +3,7 @@
 package CGI::Conduit::Log;
 
 use Moose::Role;
-use Projectus::Log qw(log_init);
+use Projectus::Log qw(init_log);
 
 ## ----------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ has 'log_filename' => ( is => 'rw' );
 after 'init' => sub {
     my ($self) = @_;
 
-    log_init( $self->log_filename );
+    init_log( $self->log_filename );
 };
 
 ## ----------------------------------------------------------------------------
