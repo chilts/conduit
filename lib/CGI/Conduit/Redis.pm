@@ -3,27 +3,17 @@
 package CGI::Conduit::Redis;
 
 use Moose::Role;
+use Projectus::Pg qw(get_redis);
 
-use Redis;
+## ----------------------------------------------------------------------------
+
+has 'redis_obj' => ( is => 'rw' );
 
 ## ----------------------------------------------------------------------------
 
 sub redis {
     my ($self) = @_;
-
-    return $self->{redis} if $self->{redis};
-
-    # currently we have no redis object, so let's create it
-    my $server = $self->cfg_value( q{redis_server} );
-
-    die 'No redis server specified'
-        unless $server;
-
-    $self->{redis} = Redis->new({
-        server => $server,
-    });
-
-    return $self->{redis};
+    return $self->redis_obj || $self->redis_obj( get_redis() );
 }
 
 after 'clear' => sub { };
