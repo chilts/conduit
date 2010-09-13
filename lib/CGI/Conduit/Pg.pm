@@ -92,6 +92,7 @@ after 'clear' => sub {
     return if $self->pg->{AutoCommit};
     # we're in a transaction so we've borked, roll it back
     $self->pg->rollback();
+    confess "We've finished the query but were still in a transaction";
 };
 
 ## ----------------------------------------------------------------------------
