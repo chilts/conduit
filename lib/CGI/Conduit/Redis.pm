@@ -3,7 +3,7 @@
 package CGI::Conduit::Redis;
 
 use Moose::Role;
-use Projectus::Pg qw(get_redis);
+use Projectus::Redis qw(get_redis);
 
 ## ----------------------------------------------------------------------------
 
