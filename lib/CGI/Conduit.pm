@@ -191,27 +191,32 @@ sub render_template {
 
 sub req_url {
     my ($self) = @_;
-    $self->cgi->url();
+    return $self->cgi->url();
 }
 
 sub req_path {
     my ($self) = @_;
-    $self->cgi->url( -absolute => 1 );
+    return $self->cgi->url( -absolute => 1 );
 }
 
 sub req_method {
     my ($self) = @_;
-    $self->cgi->request_method();
+    return $self->cgi->request_method();
 }
 
 sub req_referer {
     my ($self) = @_;
-    $self->cgi->referer();
+    return $self->cgi->referer();
 }
 
 sub req_remote_ip {
     my ($self) = @_;
-    $self->cgi->remote_host();
+    return $self->cgi->remote_host();
+}
+
+sub req_query_string {
+    my ($self) = @_;
+    return $self->cgi->query_string();
 }
 
 sub req_param {
