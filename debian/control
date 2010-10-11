@@ -1,0 +1,16 @@
+Source: libconduit-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl, libconfig-simple-perl
+Maintainer: Andrew Chilton <chilts@appsattic.com>
+Standards-Version: 3.8.3
+Homepage: http://search.cpan.org/dist/CGI-Conduit/
+
+Package: libconduit-perl
+Architecture: all
+Depends: ${misc:Depends}, libconfig-simple-perl, liblog-log4perl-perl, libmoose-perl, libprojectus-perl
+Suggests: libcache-memcached-perl, libredis-perl, libdb-couchdb-schema-perl, libjson-any-perl, libdbi-perl
+Description: CGI::Conduit is a small and thin web framework for Fast CGI applications
+ Conduit helps you do the things you really want to do in your web pages. It
+ doesn't prescribe much but gives you plenty.

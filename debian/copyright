@@ -1,0 +1,12 @@
+Name: CGI-Conduit
+Maintainer: Andrew Chilton <chilts@appsattic.com>
+Source: http://search.cpan.org/dist/CGI-Conduit/
+  http://git.appsattic.com/?p=conduit.git
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+
+Files: *
+Copyright: 2010, Apps Attic Ltd <http://www.appsattic.com/>
+License: Artistic v2
+
+License: Artistic v2
+  See COPYING for the entire license text.
