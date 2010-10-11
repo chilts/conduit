@@ -15,7 +15,7 @@ with qw(
     CGI::Conduit::Log
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 ## ----------------------------------------------------------------------------
 # accessors
@@ -275,7 +275,7 @@ CGI::Conduit - base class for nice CGI::Fast web applications
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

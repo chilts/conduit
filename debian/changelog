@@ -1,3 +1,9 @@
+libcgi-conduit-perl (0.04) unstable; urgency=low
+
+  * New release of CGI::Conduit
+
+ -- Andrew Chilton <chilts@appsattic.com>  Mon, 11 Oct 2010 22:07:26 +1300
+
 libcgi-conduit-perl (0.03) unstable; urgency=low
 
   * Initial Release.
