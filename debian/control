@@ -11,6 +11,15 @@ Package: libcgi-conduit-perl
 Architecture: all
 Depends: ${misc:Depends}, libconfig-simple-perl, liblog-log4perl-perl, libmoose-perl, libprojectus-perl
 Suggests: libcache-memcached-perl, libredis-perl, libdb-couchdb-schema-perl, libjson-any-perl, libdbi-perl
-Description: CGI::Conduit is a small and thin web framework for Fast CGI applications
+Description: small baseclass for your fast and thin Fast CGI applications
+ CGI::Conduit allows you to setup a number of parts of your web application
+ using only a config file. This includes things like connections to your
+ database, memcache servers, redis, use of Template::Toolkit, and finally
+ cookie and session dealings.
+ .
  Conduit helps you do the things you really want to do in your web pages. It
  doesn't prescribe much but gives you plenty.
+ .
+ There are some core roles in CGI::Conduit::* but also some optional ones too.
+ If you need any of these, just make sure you include the role in your
+ application module as above.
