@@ -1,4 +1,4 @@
-Source: libconduit-perl
+Source: libcgi-conduit-perl
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7)
@@ -7,7 +7,7 @@ Maintainer: Andrew Chilton <chilts@appsattic.com>
 Standards-Version: 3.8.3
 Homepage: http://search.cpan.org/dist/CGI-Conduit/
 
-Package: libconduit-perl
+Package: libcgi-conduit-perl
 Architecture: all
 Depends: ${misc:Depends}, libconfig-simple-perl, liblog-log4perl-perl, libmoose-perl, libprojectus-perl
 Suggests: libcache-memcached-perl, libredis-perl, libdb-couchdb-schema-perl, libjson-any-perl, libdbi-perl
