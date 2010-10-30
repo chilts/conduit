@@ -27,7 +27,18 @@ sub tt {
 
 sub tt_stash_set {
     my ($self, $key, $value) = @_;
-    $self->{stash}{$key} = $value;
+
+    my $location = $self->{stash};
+
+    # turn the key into something we can eval
+    $key =~ s{([a-z_-]+)}{\{$1\}}gxms;
+    $key =~ s{(\d+)}{\[$1\]}gxms;
+    $key =~ s{\.}{}gxms;
+
+    eval "\$location->$key = \$value";
+    if ( $@ ) {
+        die $@;
+    }
 }
 
 sub tt_stash_add {
