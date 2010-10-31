@@ -9,7 +9,8 @@ Homepage: http://search.cpan.org/dist/CGI-Conduit/
 
 Package: libcgi-conduit-perl
 Architecture: all
-Depends: ${misc:Depends}, libconfig-simple-perl, liblog-log4perl-perl, libmoose-perl, libprojectus-perl
+Depends: ${misc:Depends}, libconfig-simple-perl, liblog-log4perl-perl, libmoose-perl, libprojectus-perl,
+  libcgi-fast-perl
 Suggests: libcache-memcached-perl, libredis-perl, libdb-couchdb-schema-perl, libjson-any-perl, libdbi-perl
 Description: small baseclass for your fast and thin Fast CGI applications
  CGI::Conduit allows you to setup a number of parts of your web application
