@@ -74,9 +74,12 @@ sub clear {
 # handle stuff
 
 sub add_handler {
-    my ($self, $match, $handler) = @_;
+    my ($self, $match, $handler, $attr) = @_;
 
-    push @{$self->{handler}}, { match => $match, name => $handler };
+    # default to nothing
+    $attr ||= {};
+
+    push @{$self->{handler}}, { match => $match, name => $handler, attr => $attr };
 }
 
 sub handle {
@@ -87,7 +90,33 @@ sub handle {
     $self->cgi($cgi);
 
     eval {
-        $self->dispatch();
+        my ($handler, @captures) = $self->get_handler();
+
+        if ( $handler ) {
+            # we have something, but before we do anything, run the triggers
+            my $done = 0;
+            foreach my $before ( @{$handler->{attr}{before}} ) {
+                next if $done;
+                if ( $self->$before() ) {
+                    $done = 1;
+                }
+            }
+
+            # if we're already done, don't run the main handler
+            unless ( $done ) {
+                my $method = $handler->{name};
+                $self->$method( @captures );
+            }
+
+            # run ALL of the after triggers
+            foreach my $after ( @{$handler->{attr}{after}} ) {
+                $self->$after();
+            }
+        }
+        else {
+            # if we are here, then we haven't been told what to do, 404 it
+            $self->status_not_found();
+        }
     };
     if ( $@ ) {
         # something went wrong, log it to both serverlog and ours and serve a 500
@@ -99,47 +128,34 @@ sub handle {
     }
 }
 
-sub dispatch {
+sub get_handler {
     my ($self) = @_;
 
     my $path = $self->req_path;
     foreach my $handler ( @{$self->{handler}} ) {
-        # warn "trying: '$handler->{match}'";
         if ( ref $handler->{match} eq 'Regexp' ) {
             if ( my @matches = $path =~ $handler->{match} ) {
-                my $name = $handler->{name};
-                $self->$name( @matches ? @matches : $path );
-                return;
+                return ( $handler, scalar @matches ? @matches : $path );
             }
         }
         elsif ( ref $handler->{match} eq 'ARRAY' ) {
             foreach my $redirect_path ( @{$handler->{match}} ) {
-                if ( $redirect_path eq $path ) {
-                    my $name = $handler->{name};
-                    $self->$name( $path );
-                    return;
-                }
+                return ( $handler, $path )
+                    if $redirect_path eq $path;
             }
         }
         elsif ( ref $handler->{match} eq 'HASH' ) {
-            if ( exists $handler->{match}{$path} ) {
-                my $name = $handler->{name};
-                $self->$name( $path );
-                return;
-            }
+            return ( $handler, $path )
+                if exists $handler->{match}{$path};
         }
         elsif ( defined $handler->{match} ) {
-            if ( $handler->{match} eq $path ) {
-                my $name = $handler->{name};
-                $self->$name();
-                # $self->"$handler->{name}"();
-                return;
-            }
+            return ( $handler )
+                if $handler->{match} eq $path;
         }
     }
 
-    # if we are here, then we haven't been told what to do, 404 it
-    $self->status_not_found();
+    # we didn't find anything that matches, therefore there is no handler
+    return;
 }
 
 ## ----------------------------------------------------------------------------

@@ -43,6 +43,27 @@ sub setup_handlers {
     $self->add_handler( '/log', 'page_log' );
     $self->add_handler( '/cgi', 'page_cgi' );
     $self->add_handler( '/header', 'page_header' );
+    $self->add_handler(
+        '/trigger/before',
+        'home',
+        {
+            before => [ qw(trigger_before) ],
+        }
+    );
+    $self->add_handler(
+        '/trigger/after',
+        'home',
+        {
+            after => [ qw(trigger_after) ],
+        }
+    );
+    $self->add_handler(
+        '/trigger/unauthorised',
+        'home',
+        {
+            before => [ qw(trigger_before_unauthorised trigger_before) ],
+        }
+    );
 
     return;
 
@@ -53,6 +74,26 @@ sub setup_handlers {
         # authenticated => 0,
         # admin         => 0,
     });
+}
+
+sub trigger_before {
+    my ($self) = @_;
+    my $log = get_logger();
+    $log->info(qq{Trigger Before: Hello, World!});
+    return 0;
+}
+
+sub trigger_after {
+    my ($self) = @_;
+    my $log = get_logger();
+    $log->info(qq{Trigger After: Goodbye, World!});
+    return 0;
+}
+
+sub trigger_before_unauthorised {
+    my ($self) = @_;
+    $self->status_temp_redirect( '/' );
+    return 1;
 }
 
 sub debug {
@@ -133,7 +174,6 @@ sub page_cookie_del {
     my ($self) = @_;
 
     my $name = $self->req_param('name');
-    warn "name=$name";
 
     unless ( defined $name ) {
         $self->tt_stash_set( 'err', 'No cookie name provided' );
