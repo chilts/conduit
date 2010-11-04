@@ -54,6 +54,14 @@ sub pg_do {
     return $self->pg->do($sql, undef, @params );
 }
 
+sub pg_count {
+    my ($self, $table_name) = @_;
+    my ($count) = $self->pg->selectrow_array(
+        qq{ SELECT count(id) FROM $table_name}
+    );
+    return $count;
+}
+
 after 'clear' => sub {
     my ($self) = @_;
 
