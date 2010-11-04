@@ -1,5 +1,8 @@
 Revision history for CGI-Conduit
 
+0.05    Thu Nov 04 2010
+        Can now do before/after handler triggers (amongst other things).
+
 0.04    Mon Oct 11 2010
         Lots and lots of new stuff.
 

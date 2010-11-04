@@ -1,3 +1,12 @@
+libcgi-conduit-perl (0.05-1) lucid; urgency=low
+
+  * Move some development files out of the way
+  * Add libcgi-fast-perl to dependencies
+  * Add ability to have before/after handler triggers
+  * Add a utility count() method to CGI::Conduit::Pg
+
+ -- Andrew Chilton <chilts@appsattic.com>  Thu, 04 Nov 2010 15:53:14 +1300
+
 libcgi-conduit-perl (0.04-1) unstable; urgency=low
 
   * Add libcgi-fast-perl as a dependency
