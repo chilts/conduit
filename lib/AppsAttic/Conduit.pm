@@ -65,15 +65,9 @@ sub setup_handlers {
         }
     );
 
-    return;
+    # do regex match and save the results
+    $self->add_handler( qr{ \A /regex/(.*) \z }xms, 'page_regex' );
 
-    # ToDo: make it look like this
-    $self->add_handler({
-        match         => qr{ \A / \z }xms,
-        method        => 'home',
-        # authenticated => 0,
-        # admin         => 0,
-    });
 }
 
 sub trigger_before {
@@ -298,6 +292,14 @@ sub page_log {
     $self->tt_stash_set('title', 'Log Stuff');
     $self->tt_stash_set('msg', qq{You just logged: $msg});
     $self->render_template( q{log.html} );
+}
+
+sub page_regex {
+    my ($self, $rest) = @_;
+
+    $self->tt_stash_set('title', 'Regex Stuff');
+    $self->tt_stash_set('rest', $rest);
+    $self->render_template( q{rest.html} );
 }
 
 ## ----------------------------------------------------------------------------
