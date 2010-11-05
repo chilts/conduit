@@ -14,7 +14,8 @@ Depends: ${misc:Depends},
  libconfig-simple-perl,
  liblog-log4perl-perl,
  libmoose-perl,
- libprojectus-perl
+ libprojectus-perl,
+ liburi-perl
 Suggests: libcache-memcached-perl,
  libredis-perl,
  libdb-couchdb-schema-perl,

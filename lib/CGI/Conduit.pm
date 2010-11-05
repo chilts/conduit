@@ -5,6 +5,7 @@ package CGI::Conduit;
 use Carp;
 use Moose;
 use Log::Log4perl qw(get_logger);
+use URI::Escape;
 
 # use the core roles
 with qw(
@@ -135,7 +136,10 @@ sub get_handler {
     foreach my $handler ( @{$self->{handler}} ) {
         if ( ref $handler->{match} eq 'Regexp' ) {
             if ( my @matches = $path =~ $handler->{match} ) {
-                return ( $handler, scalar @matches ? @matches : $path );
+                @matches = ($path) unless @matches;
+                $_ = uri_unescape($_)
+                    for @matches;
+                return ( $handler, @matches );
             }
         }
         elsif ( ref $handler->{match} eq 'ARRAY' ) {
