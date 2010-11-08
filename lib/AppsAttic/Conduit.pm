@@ -12,6 +12,7 @@ with qw(
     CGI::Conduit::Memcache
     CGI::Conduit::Log
     CGI::Conduit::Template
+    CGI::Conduit::ContentType
 );
 
 use Log::Log4perl qw(get_logger);
@@ -65,9 +66,23 @@ sub setup_handlers {
         }
     );
 
+    # do some other content types (txt and json)
+    $self->add_handler( '/content.txt', 'p_text' );
+    $self->add_handler( '/content.json', 'p_json' );
+
     # do regex match and save the results
     $self->add_handler( qr{ \A /regex/(.*) \z }xms, 'page_regex' );
 
+}
+
+sub p_text {
+    my ($self) = @_;
+    $self->render_text( qq{Hello, World!\n} );
+}
+
+sub p_json {
+    my ($self) = @_;
+    $self->render_json({ this => 'is', some => 'data' });
 }
 
 sub trigger_before {
