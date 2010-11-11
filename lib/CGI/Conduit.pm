@@ -185,6 +185,13 @@ sub render_content {
     $self->render_final();
 }
 
+sub render_content_with_type {
+    my ($self, $type, $content) = @_;
+    $self->res_content_type($type);
+    $self->res_content($content);
+    $self->render_final();
+}
+
 sub render_template {
     my ($self, $template_name) = @_;
 
