@@ -1,3 +1,17 @@
+libcgi-conduit-perl (0.06) lucid; urgency=low
+
+  * Depend on the newest Projectus
+  * Use the Projectus::Valid module for this stuff
+  * Add the CGI::Conduiti::Random module
+  * Make the rendering of a particular type easier :)
+  * Add 2 test cases for content types txt and json
+  * Add the helper functions for rendering different content types
+  * Oopse, need this template for the regexp test
+  * Unescape the paths captured with a Regex (and depend on liburi-perl too)
+  * Do a regex dispatch test
+
+ -- Andrew Chilton <chilts@appsattic.com>  Mon, 15 Nov 2010 18:08:52 +1300
+
 libcgi-conduit-perl (0.05-1) lucid; urgency=low
 
   * Move some development files out of the way
