@@ -1,11 +1,6 @@
 Revision history for CGI-Conduit
 
 0.06    Mon Nov 15 2010
-        Allow multi-level data structures in tt_stash_set()
-        Add a utility count method for the number of table rows
-        Add ability to have before and after triggers ... the before ones can stop the handler getting invoked
-        Add libcgi-fast-perl to the dependencies
-        Move the example development etc files into dev/amalthea/
         Do a regex dispatch test
         Unescape the paths captured with a Regex (and depend on liburi-perl too)
         Oopse, need this template for the regexp test
