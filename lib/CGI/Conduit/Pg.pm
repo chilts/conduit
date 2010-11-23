@@ -3,7 +3,7 @@
 package CGI::Conduit::Pg;
 
 use Moose::Role;
-use Projectus::Pg qw(get_pg);
+use Projectus::Pg qw(get_dbh);
 
 ## ----------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ has 'pg_obj' => ( is => 'rw' );
 
 sub pg {
     my ($self) = @_;
-    return $self->pg_obj || $self->pg_obj( get_pg() );
+    return $self->pg_obj || $self->pg_obj( get_dbh() );
 }
 
 sub pg_begin {
