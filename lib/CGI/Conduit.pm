@@ -348,7 +348,7 @@ application module as above.
 
 =head1 BUGS
 
-This section is left intentionally blank.
+Please report bugs to C<< <chilts at appsattic dot com> >>
 
 =head1 SUPPORT
 
