@@ -252,6 +252,18 @@ sub req_param {
     return $params->{$param_name};
 }
 
+sub req_param_list {
+    my ($self, $param_name) = @_;
+    my $params = $self->req_params;
+
+    return [] unless defined $params->{$param_name};
+
+    return ref $params->{$param_name} eq 'ARRAY'
+        ? $params->{$param_name}
+        : [ $params->{$param_name} ]
+    ;
+}
+
 sub req_params {
     my ($self) = @_;
 
