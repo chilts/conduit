@@ -98,7 +98,7 @@ sub handle {
             my $done = 0;
             foreach my $before ( @{$handler->{attr}{before}} ) {
                 next if $done;
-                if ( $self->$before() ) {
+                if ( $self->$before( @captures ) ) {
                     $done = 1;
                 }
             }
@@ -111,7 +111,7 @@ sub handle {
 
             # run ALL of the after triggers
             foreach my $after ( @{$handler->{attr}{after}} ) {
-                $self->$after();
+                $self->$after( @captures );
             }
         }
         else {
