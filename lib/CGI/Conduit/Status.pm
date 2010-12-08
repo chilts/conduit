@@ -39,6 +39,12 @@ sub status_not_found {
     $self->render_template( q{404.html} );
 }
 
+sub status_forbidden {
+    my ($self) = @_;
+    $self->status(403);
+    $self->render_template( q{403.html} );
+}
+
 sub status_internal_server_error {
     my ($self) = @_;
     $self->status(500);
