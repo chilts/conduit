@@ -69,7 +69,7 @@ sub session_new {
     unless ( $value ) {
         my $log = get_logger();
         $log->fatal(qq{Trying to set a session to undef});
-        croak qq{Trying to set a session to undef}
+        croak qq{Trying to set a session to undef};
     }
 
     my $log = get_logger();
