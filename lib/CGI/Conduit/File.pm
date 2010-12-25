@@ -2,10 +2,15 @@
 
 package CGI::Conduit::File;
 
+use Carp qw(croak);
 use Moose::Role;
 use File::Basename;
 use File::Copy;
 use File::Slurp;
+
+with 'CGI::Conduit::Log';
+
+use Log::Log4perl qw(get_logger);
 
 ## ----------------------------------------------------------------------------
 
