@@ -13,6 +13,8 @@ with 'CGI::Conduit::Log';
 
 use Log::Log4perl qw(get_logger);
 
+my $log = get_logger();
+
 ## ----------------------------------------------------------------------------
 
 has 'session_id' => ( is => 'rw' );
@@ -28,8 +30,6 @@ sub session {
     # firstly, check for a session cookie
     my $cookie = $self->cookie_get('session');
     return unless defined $cookie;
-
-    my $log = get_logger();
 
     # get the cookie value which is the session id and check it for validity
     my $id = $cookie->value();
@@ -63,21 +63,20 @@ sub is_session_id_valid {
     return;
 }
 
+# Note: if make a session twice, the second Cookie will override the first and
+# the first session will be inaccessible
 sub session_new {
     my ($self, $value) = @_;
 
     unless ( $value ) {
-        my $log = get_logger();
         $log->fatal(qq{Trying to set a session to undef});
         croak qq{Trying to set a session to undef};
     }
 
-    my $log = get_logger();
-
     my $id = id(32);
     my $mc = $self->memcache();
     unless ( $mc->set("session:$id", $value) ) {
-        $log->warn("session_new(): Trying to set session $id failed");
+        $log->warn("session_new(): Trying to set new session '$id' failed");
         return;
     }
 
@@ -91,23 +90,35 @@ sub session_new {
 }
 
 sub session_set {
-    my ($self, $id, $value) = @_;
+    my ($self, $value) = @_;
+
+    unless ( $self->session ) {
+        $log->fatal(qq{Trying to set a session that doesn't yet exist});
+        croak qq{Trying to set a session that doesn't yet exist};
+    }
+
+    # must be there if $self->session() succeeded
+    my $id = $self->session_id();
 
     unless ( $value ) {
-        my $log = get_logger();
         $log->fatal(qq{Trying to set a session to undef});
         croak qq{Trying to set a session to undef};
     }
 
     my $mc = $self->memcache();
-    $mc->set("session:$id", $value);
+    unless ( $mc->set("session:$id", $value) ) {
+        $log->warn("session_set(): Trying to set session '$id' failed");
+        return;
+    }
+
+    # remember this new session
+    $self->{session} = $value;
 }
 
 sub session_get {
     my ($self, $id) = @_;
 
-    # no need to check for a valid session id since that's already been done,
-    # so just return the session if it's there
+    # just return the session if it's there
     return $self->memcache()->get( qq{session:$id} );
 }
 
@@ -115,7 +126,6 @@ sub session_del {
     my ($self) = @_;
 
     unless ( $self->session ) {
-        my $log = get_logger();
         $log->fatal("session_del(): trying to delete a session which doesn't (yet) exist");
         croak "session_del(): trying to delete a session which doesn't (yet) exist";
     }
