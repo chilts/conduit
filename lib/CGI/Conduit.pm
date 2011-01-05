@@ -288,7 +288,6 @@ sub req_params {
     # ie. /path?this+that   # makes an array : keywords => ['this','that']
     #
     if ( my $kw = delete $params{keywords} ) {
-        die "ToDo: We never actually get in here, so this code can be removed";
         $params{$kw} = '';
     }
 
