@@ -19,7 +19,7 @@ sub hdr_add_header {
 
 sub hdr_no_cache {
     my ($self) = @_;
-    push @{$self->{hdr}}, '-Pragma', 'no-cache';
+    # don't do a "Pragma: no-cache" -> http://www.mnot.net/cache_docs/#PRAGMA
     push @{$self->{hdr}}, '-Cache-control', 'no-cache';
 }
 
