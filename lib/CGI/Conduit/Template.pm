@@ -64,14 +64,18 @@ sub tt_stash_del {
 sub tt_pluralise {
     my ($self, $count, $singular, $plural) = @_;
 
+    $plural ||= qq{${singular}s};
     $count ||= 0;
-    return "no " . ($plural || $singular)
-        if $count == 0;
 
-    return "1 $singular"
-        if $count == 1;
+    if ( $count == 0 ) {
+        return qq{no $plural};
+    }
+    elsif ( $count == 1 ) {
+        return qq{1 $singular};
+    }
 
-    return "$count " . ($plural || $singular);
+    # for all other values, use the plural
+    return qq{$count $plural};
 }
 
 after 'clear' => sub {
