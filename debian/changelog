@@ -1,3 +1,9 @@
+libcgi-conduit-perl (0.08) lucid; urgency=low
+
+  * Don't do 'Pragma: no-cache' anymore
+
+ -- Andrew Chilton <chilts@appsattic.com>  Wed, 02 Feb 2011 21:41:39 +1300
+
 libcgi-conduit-perl (0.07) lucid; urgency=low
 
   * We _do_ get in there, so set the 'keywords' to nothing and set the proper key to the empty string
