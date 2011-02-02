@@ -1,3 +1,9 @@
+libcgi-conduit-perl (0.09) lucid; urgency=low
+
+  * Change tt_pluralise() to allow plural to be dropped (if it's just an 's')
+
+ -- Andrew Chilton <chilts@appsattic.com>  Wed, 02 Feb 2011 21:46:34 +1300
+
 libcgi-conduit-perl (0.08) lucid; urgency=low
 
   * Don't do 'Pragma: no-cache' anymore
