@@ -11,8 +11,8 @@ was 'v0.1.1' and you're on master (ie. v0.1.1..master (master is optional)):
     git commit -m 'Prepare for new release of Conduit' PACKAGING
     git push origin master
 
-    export PREV_REL=0.06
-    export RELEASE=0.07
+    export PREV_REL=0.07
+    export RELEASE=0.08
 
     git log v${PREV_REL}..master | grep '^    ' | sort -r | sed 's/^   /  */' | xclip
     # copy the clipboard into an editor somewhere
@@ -28,9 +28,7 @@ Change the top version number and remove the 'ubuntu' part. Make sure it is in
 
     git push origin master
 
-Test build it and release it (see below).
-
-Then tag the release;
+Tag the release;
 
     git tag -m 'CGI::Conduit v$RELEASE' v$RELEASE
     git tag -l
@@ -55,6 +53,7 @@ Review the updates and rsync to the repo:
 
     git commit -a -m "New release (v$RELEASE) of CGI::Conduit" # also deletes the ones missing
     git push origin master
+
     make rsync
     cd -
 
