@@ -1,3 +1,10 @@
+libcgi-conduit-perl (0.10) lucid; urgency=low
+
+  * Fix up parsing of things like 'err.address1' when setting a Template::Toolkit stash
+  * Prepare for new release of Conduit (v0.10)
+
+ -- Andrew Chilton <chilts@appsattic.com>  Fri, 18 Feb 2011 10:05:33 +1300
+
 libcgi-conduit-perl (0.09) lucid; urgency=low
 
   * Change tt_pluralise() to allow plural to be dropped (if it's just an 's')
