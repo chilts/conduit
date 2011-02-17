@@ -31,8 +31,9 @@ sub tt_stash_set {
     my $location = $self->{stash};
 
     # turn the key into something we can eval
-    $key =~ s{([a-z_-]+)}{\{$1\}}gxms;
-    $key =~ s{(\d+)}{\[$1\]}gxms;
+    $key =~ s{([a-z][a-z0-9_-]*)}{\{$1\}}gxms;
+    # can be an array if at the start of the string, or after a dot (not within hashes above e.g. not 'address1')
+    $key =~ s{ (?: \A (\d) ) | (?: \.(\d+) ) }{\[$1\]}gxms;
     $key =~ s{\.}{}gxms;
 
     eval "\$location->$key = \$value";
