@@ -82,8 +82,12 @@ sub session_new {
 
     $log->debug("session_new(): Setting new session '$id'");
 
-    # setting the session worked, so set the appropriate bits and return the id
-    $self->cookie_set( q{session}, $id );
+    # saving the session worked, so set the appropriate bits and return the id
+    my $opts = {};
+    if ( $self->cfg_value('session_expire') ) {
+        $opts->{expire} = $self->cfg_value('session_expire');
+    }
+    $self->cookie_set( q{session}, $id, $opts );
     $self->session_id($id);
     $self->{session} = $value;
     return $id;
