@@ -11,7 +11,7 @@ was 'v0.1.1' and you're on master (ie. v0.1.1..master (master is optional)):
     export PREV_REL=0.11.0
     export RELEASE=0.12.0
 
-    git commit -m "Prepare for new release of Conduit (v$RELEASE)" PACKAGING
+    git commit -m "Prepare for new release of Conduit (v$RELEASE)" PACKAGING lib/CGI/Conduit.pm
     git show
     git push origin master
 
