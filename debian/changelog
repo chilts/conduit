@@ -1,3 +1,10 @@
+libcgi-conduit-perl (0.11.0) lucid; urgency=low
+
+  * Allow the user to set the session expiry in the config file
+  * Prepare for new release of Conduit (v0.11.0)
+
+ -- Andrew Chilton <chilts@appsattic.com>  Wed, 04 May 2011 16:18:41 +1200
+
 libcgi-conduit-perl (0.10) lucid; urgency=low
 
   * Fix up parsing of things like 'err.address1' when setting a Template::Toolkit stash
