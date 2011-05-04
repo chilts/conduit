@@ -84,8 +84,8 @@ sub session_new {
 
     # saving the session worked, so set the appropriate bits and return the id
     my $opts = {};
-    if ( $self->cfg_value('session_expire') ) {
-        $opts->{expire} = $self->cfg_value('session_expire');
+    if ( $self->cfg_value('session_expires') ) {
+        $opts->{expires} = $self->cfg_value('session_expires');
     }
     $self->cookie_set( q{session}, $id, $opts );
     $self->session_id($id);

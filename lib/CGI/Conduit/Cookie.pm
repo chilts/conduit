@@ -30,16 +30,19 @@ sub cookie_get {
 
 sub cookie_set {
     my ($self, $name, $value, $opts) = @_;
-
-    # defaults
     $opts ||= {};
-    my $expire = $opts->{expire} || '+8hr';
 
-    my $c = CGI::Cookie->new(
+    my %args = (
         -name    =>  $name,
         -value   =>  $value,
-        -expires =>  $expire
     );
+
+    # if we have been given an expiration, set it
+    if ( $opts->{expires} ) {
+        $args{expires} = $opts->{expires};
+    }
+
+    my $c = CGI::Cookie->new( %args );
 
     # add this cookie to the response cookie list
     push @{$self->{res_cookie}}, $c;
@@ -47,7 +50,7 @@ sub cookie_set {
 
 sub cookie_del {
     my ($self, $name) = @_;
-    $self->cookie_set($name, '', { expire => '-3d' } );
+    $self->cookie_set($name, '', { expires => '-3d' } );
 }
 
 after 'clear' => sub {
