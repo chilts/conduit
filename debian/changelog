@@ -1,3 +1,10 @@
+libcgi-conduit-perl (0.12.0) lucid; urgency=low
+
+  * Allow a 'session' cookie and remove +8hr default
+  * Prepare for new release of Conduit (v0.12.0)
+
+ -- Andrew Chilton <chilts@appsattic.com>  Wed, 04 May 2011 16:36:05 +1200
+
 libcgi-conduit-perl (0.11.0) lucid; urgency=low
 
   * Allow the user to set the session expiry in the config file
