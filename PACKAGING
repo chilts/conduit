@@ -8,8 +8,8 @@ was 'v0.1.1' and you're on master (ie. v0.1.1..master (master is optional)):
     git tag -l
 
     # now change this file (PACKAGING) and lib/CGI/Conduit.pm to reflect the new version numbers
-    export PREV_REL=0.10
-    export RELEASE=0.11.0
+    export PREV_REL=0.11.0
+    export RELEASE=0.12.0
 
     git commit -m "Prepare for new release of Conduit (v$RELEASE)" PACKAGING
     git show
