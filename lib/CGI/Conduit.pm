@@ -123,7 +123,7 @@ sub handle {
         # something went wrong, log it to both serverlog and ours and serve a 500
         my $msg = qq{Application died: $@};
         my $log = get_logger();
-        $log->fatal( $msg );;
+        $log->fatal( $msg );
         warn $msg;
         $self->status_internal_server_error();
     }
